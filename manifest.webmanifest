@@ -1,0 +1,12 @@
+{
+  "name": "Le carnet de Véronique",
+  "short_name": "Carnet",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#241c18",
+  "theme_color": "#241c18",
+  "icons": [{ "src": "engine/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

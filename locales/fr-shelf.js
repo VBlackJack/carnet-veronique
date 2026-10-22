@@ -24,4 +24,6 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "shelf.play": `Ouvrir l'enquête`,
   "shelf.chevrerie.title": `Le Mystère de la Chèvrerie`,
   "shelf.chevrerie.tagline": `Monts du Lyonnais, un samedi de novembre. De la brume, une chèvre championne, et une porte ouverte.`,
+  "shelf.boule-a-facettes.title": `La Boule à facettes`,
+  "shelf.boule-a-facettes.tagline": `Paris, 1978. Une star du disco, un collier de diamants, et soixante-dix secondes de noir.`,
 });

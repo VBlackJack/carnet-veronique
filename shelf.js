@@ -23,4 +23,9 @@ CH.shelf = [
     released: true,
     cover: "goat",
   },
+  {
+    id: "boule-a-facettes",
+    released: true,
+    cover: "disco",
+  },
 ];

@@ -428,8 +428,13 @@
   function cardHtml(kind, id, title, text, extra) {
     const s = S();
     const key = kind === "ded" ? "d:" + id : id;
-    const cls = ["card", kind, extra ? "wide" : "", s.fresh[key] ? "fresh" : "", notebookState.selected === id ? "selected" : "", hintCards.includes(id) ? "pulse" : ""].join(" ");
-    return `<button class="${cls}" data-id="${esc(id)}" data-kind="${kind}"><h3>${esc(title)}</h3><p>${rich(text)}</p>${extra || ""}</button>`;
+    // A deduction may be a mere hypothesis, crossed out once a later deduction disproves it.
+    const def = kind === "ded" ? CH.deductions.get(id) : null;
+    const hypo = def && def.kind === "hypothesis";
+    const invalid = hypo && def.invalidatedBy && s.deds[def.invalidatedBy];
+    const tag = hypo ? `<span class="hypo-tag">${esc(t(invalid ? "ui.hypo_invalid" : "ui.hypo"))}</span>` : "";
+    const cls = ["card", kind, hypo ? "hypo" : "", invalid ? "invalid" : "", extra ? "wide" : "", s.fresh[key] ? "fresh" : "", notebookState.selected === id ? "selected" : "", hintCards.includes(id) ? "pulse" : ""].join(" ");
+    return `<button class="${cls}" data-id="${esc(id)}" data-kind="${kind}">${tag}<h3>${esc(title)}</h3><p>${rich(text)}</p>${extra || ""}</button>`;
   }
 
   function renderNotebook() {
@@ -439,8 +444,12 @@
     const tabLabel = { clues: "ui.tab_clues", deds: "ui.tab_deds", grid: "ui.tab_grid", items: "ui.tab_items" };
     let cards = "";
     if (st.tab === "clues") {
-      const ids = s.clueOrder.filter((id) => !CH.clues.hidden(s, id));
+      // Observations are short notes listed under the cards; they cannot be paired.
+      const isObs = (id) => !!(CH.clues.isObs && CH.clues.isObs(id));
+      const ids = s.clueOrder.filter((id) => !CH.clues.hidden(s, id) && !isObs(id));
+      const obs = st.pick ? [] : s.clueOrder.filter(isObs);
       cards = ids.length ? ids.map((id) => cardHtml("clue", id, t(`clue.${id}.title`), t(`clue.${id}.text`), CH.clues.visual(id))).join("") : `<p class="empty">${esc(t("ui.empty_clues"))}</p>`;
+      if (obs.length) cards += `<div class="obs-list"><h3>${esc(t("ui.observations"))}</h3><ul>${obs.map((id) => `<li class="${s.fresh[id] ? "fresh" : ""}"><strong>${esc(t(`clue.${id}.title`))}</strong> ${rich(t(`clue.${id}.text`))}</li>`).join("")}</ul></div>`;
     } else if (st.tab === "grid") {
       cards = gridHtml();
     } else if (st.tab === "deds") {
@@ -523,7 +532,9 @@
   // ---------------------------------------------------------------- Hypothesis
   function openHypothesis(witness) {
     return new Promise((resolve) => {
-      hypState = { witness, pick: { who: null, weapon: null, room: null }, resolve };
+      const pick = {};
+      CH.cluedo.KINDS.forEach((k) => (pick[k] = null));
+      hypState = { witness, pick, resolve };
       // The menu that opened the panel has already answered: hide it behind the panel.
       closeDialog();
       el.board.hidden = false;

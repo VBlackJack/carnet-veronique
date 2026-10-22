@@ -59,7 +59,8 @@
     s.clues[id] = true;
     s.clueOrder.push(id);
     s.fresh[id] = true;
-    CH.ui.toast(CH.t("ui.new_clue", { title: CH.t(`clue.${id}.title`) }));
+    const obs = CH.clues.isObs && CH.clues.isObs(id);
+    CH.ui.toast(CH.t(obs ? "ui.new_obs" : "ui.new_clue", { title: CH.t(`clue.${id}.title`) }), obs ? "muted" : "");
     announceCrossed();
     // A story may derive further cards from this one (fragments that make a whole).
     if (ST().onClue) ST().onClue(s, id).forEach(addClue);
@@ -70,7 +71,8 @@
     s.deds[id] = true;
     s.dedOrder.push(id);
     s.fresh["d:" + id] = true;
-    CH.ui.toast(CH.t("ui.new_ded", { title: CH.t(`ded.${id}.title`) }), "ded");
+    const def = CH.deductions.get(id);
+    CH.ui.toast(CH.t(def && def.kind === "hypothesis" ? "ui.new_hypo" : "ui.new_ded", { title: CH.t(`ded.${id}.title`) }), "ded");
     announceCrossed();
     return true;
   }
@@ -285,7 +287,8 @@
   // Hypothesis put to a witness: they refute one card if they can and hand over its clue.
   async function hypothesis(witness, hyp) {
     s.hyps++;
-    const names = { who: CH.cluedo.inline("who", hyp.who), weapon: CH.cluedo.inline("weapon", hyp.weapon), room: CH.cluedo.inline("room", hyp.room) };
+    const names = {};
+    CH.cluedo.KINDS.forEach((k) => (names[k] = CH.cluedo.inline(k, hyp[k])));
     await CH.ui.say("v", CH.t("hyp.ask", names));
     const r = CH.cluedo.refute(s, witness, hyp);
     if (!r && hyp.who === witness) return run([{ l: `hyp.${witness}.self` }]);

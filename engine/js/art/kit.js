@@ -204,10 +204,20 @@
     const w = gl.thick ? 5.5 : 3;
     const tilt = gl.crooked ? `transform="rotate(-6 0 -362)"` : "";
     let s = "";
+    // Lens fill: clear by default, or tinted (sunglasses, DJ shades).
+    const lens = gl.tint ? `fill="${gl.tint}" fill-opacity=".6"` : 'fill="#ffffff" fill-opacity=".14"';
+    if (gl.aviator) {
+      s += sh(soft([[-38, -376], [-6, -374], [-7, -356], [-16, -342], [-30, -344], [-38, -358]], 0.8), gl.tint || "#ffffff", { stroke: col, sw: w, extra: gl.tint ? 'fill-opacity=".6"' : 'fill-opacity=".14"' });
+      s += sh(soft([[6, -374], [38, -376], [38, -358], [30, -344], [16, -342], [7, -356]], 0.8), gl.tint || "#ffffff", { stroke: col, sw: w, extra: gl.tint ? 'fill-opacity=".6"' : 'fill-opacity=".14"' });
+      s += ink(line(-6, -372, 6, -372, 0.2), w * 0.8, { stroke: col }) + ink(line(-6, -366, 6, -366, 0.2), w * 0.6, { stroke: col });
+      s += ink(line(-38, -370, -46, -364, 0.3), w * 0.7, { stroke: col }) + ink(line(38, -370, 46, -364, 0.3), w * 0.7, { stroke: col });
+      s += ink(line(-30, -370, -22, -372, 0.2), 2, { stroke: "#ffffff", op: 0.7 });
+      return g(s, tilt);
+    }
     if (gl.round || gl.pinceNez) {
       const r = gl.pinceNez ? 12 : 15;
-      s += `<circle cx="-20" cy="-362" r="${r}" fill="#ffffff" fill-opacity=".14" stroke="${col}" stroke-width="${w}"/>`;
-      s += `<circle cx="20" cy="-362" r="${r}" fill="#ffffff" fill-opacity=".14" stroke="${col}" stroke-width="${w}"/>`;
+      s += `<circle cx="-20" cy="-362" r="${r}" ${lens} stroke="${col}" stroke-width="${w}"/>`;
+      s += `<circle cx="20" cy="-362" r="${r}" ${lens} stroke="${col}" stroke-width="${w}"/>`;
       s += ink(curve([[-20 + r, -364], [0, -370], [20 - r, -364]], 0.3), w * 0.8, { stroke: col });
       if (gl.pinceNez) {
         s += ink(curve([[-20 - r, -360], [-46, -330], [-30, -290], [-10, -270]], 0.5), 1.4, { stroke: "#2b2b2b", op: 0.8 });
@@ -218,8 +228,9 @@
       s += ink(line(-26, -368, -21, -372, 0.2), 2, { stroke: "#ffffff", op: 0.8 });
       return g(s, tilt);
     }
-    s += sh(soft([[-36, -374], [-6, -375], [-6, -352], [-12, -347], [-32, -347], [-37, -356]], 1), "#ffffff", { stroke: col, sw: w, op: 0.95, extra: 'fill-opacity=".14"' });
-    s += sh(soft([[6, -375], [36, -374], [37, -356], [32, -347], [12, -347], [6, -352]], 1), "#ffffff", { stroke: col, sw: w, op: 0.95, extra: 'fill-opacity=".14"' });
+    const lensFill = gl.tint || "#ffffff", lensOp = gl.tint ? 'fill-opacity=".6"' : 'fill-opacity=".14"';
+    s += sh(soft([[-36, -374], [-6, -375], [-6, -352], [-12, -347], [-32, -347], [-37, -356]], 1), lensFill, { stroke: col, sw: w, op: 0.95, extra: lensOp });
+    s += sh(soft([[6, -375], [36, -374], [37, -356], [32, -347], [12, -347], [6, -352]], 1), lensFill, { stroke: col, sw: w, op: 0.95, extra: lensOp });
     s += ink(line(-6, -368, 6, -368, 0.3), w * 0.8, { stroke: col });
     s += ink(line(-37, -368, -44, -364, 0.3), w * 0.7, { stroke: col });
     s += ink(line(37, -368, 44, -364, 0.3), w * 0.7, { stroke: col });
@@ -244,6 +255,8 @@
         return sh(blob(0, -414, 26, 20, 0.06, 10), h);
       case "wavyBob":
         return sh(soft([[-56, -390], [-62, -340], [-60, -318], [-44, -312], [44, -312], [60, -318], [62, -340], [56, -390], [0, -418]], 2), h);
+      case "curly":
+        return sh(blob(0, -372, 74, 66, 0.16, 18), h);
       default:
         return "";
     }
@@ -303,6 +316,9 @@
         return sh(soft([[-46, -368], [-44, -398], [-24, -414], [16, -416], [42, -402], [46, -372], [38, -390], [10, -400], [-14, -404], [-20, -392], [-38, -384]], 1), h) + ink(line(-16, -412, -20, -394, 0.3), 1.6, { stroke: "#000", op: 0.3 });
       case "bald":
         return sh(soft([[-46, -360], [-44, -380], [-38, -372]], 1), h) + sh(soft([[46, -360], [44, -380], [38, -372]], 1), h);
+      case "curly":
+        // A fringe of small curls along the hairline.
+        return [-40, -26, -12, 2, 16, 30, 42].map((x, i) => sh(blob(x, -398 - (i % 2) * 8, 13, 12, 0.12, 8), h, { sw: 2 })).join("");
       default:
         return "";
     }
@@ -353,12 +369,19 @@
     } else if (c.skirt) {
       s += sh(soft([[-50, -170], [50, -170], [58, -40], [-58, -40]], 2), c.skirt);
       s += sh(rect(-30, -44, 18, 36, 1.5), c.legs || c.skin) + sh(rect(12, -44, 18, 36, 1.5), c.legs || c.skin);
+    } else if (c.flares) {
+      s += sh(soft([[-40, -172], [-6, -172], [-6, -90], [-2, -12], [-50, -12], [-38, -90]], 1.5), c.pants);
+      s += sh(soft([[6, -172], [40, -172], [38, -90], [50, -12], [2, -12], [6, -90]], 1.5), c.pants);
     } else {
       s += sh(soft([[-40, -172], [-6, -172], [-8, -14], [-36, -14]], 1.5), c.pants);
       s += sh(soft([[6, -172], [40, -172], [36, -14], [8, -14]], 1.5), c.pants);
       if (c.cuffs) {
         s += sh(rect(-38, -34, 32, 14, 1), c.pants) + sh(rect(6, -34, 32, 14, 1), c.pants);
       }
+    }
+    if (c.legwarmers) {
+      s += sh(rect(-40, -84, 34, 70, 1.2), c.legwarmers) + sh(rect(6, -84, 34, 70, 1.2), c.legwarmers);
+      for (let y = -76; y < -18; y += 9) s += ink(line(-38, y, -8, y, 0.3), 1.2, { op: 0.35 }) + ink(line(8, y, 38, y, 0.3), 1.2, { op: 0.35 });
     }
     // Feet
     if (c.sandals) {
@@ -376,7 +399,19 @@
     } else {
       s += sh(soft([[-56, -302], [56, -302], [54, -230], [50, -160], [-50, -160], [-54, -230]], 2), c.top);
     }
-    if (c.vneck) s += sh(soft([[-16, -302], [0, -272], [16, -302]], 0.5), c.skin, { sw: 2 });
+    if (c.stripes) for (let y = -288; y < -170; y += 24) s += sh(rect(-52, y, 104, 10, 0.8), c.stripes, { sw: 0, op: 0.9 });
+    if (c.sequins) {
+      // Scattered sequins over the outfit, legs included for a jumpsuit.
+      const spots = c.flares ? 46 : 26;
+      for (let i = 0; i < spots; i++) {
+        const onLegs = c.flares && i % 2 === 1;
+        const x = onLegs ? (i % 4 === 1 ? -24 : 24) + jit(14) : jit(48);
+        const y = onLegs ? -160 + rnd() * 140 : -296 + rnd() * 130;
+        s += `<circle cx="${f(x)}" cy="${f(y)}" r="2.4" fill="${c.sequins}" opacity=".85"/>`;
+      }
+    }
+    if (c.vneck || c.openShirt) s += sh(soft([[-16, -302], [0, c.openShirt ? -250 : -272], [16, -302]], 0.5), c.skin, { sw: 2 });
+    if (c.goldChain) s += ink(curve([[-14, -300], [0, -272], [14, -300]], 0.3), 2.2, { stroke: "#d9b44a" });
     if (c.shirtCollar) s += sh(soft([[-16, -304], [0, -282], [-4, -300]], 0.4), c.shirtCollar, { sw: 1.8 }) + sh(soft([[16, -304], [0, -282], [4, -300]], 0.4), c.shirtCollar, { sw: 1.8 });
     if (c.knit) for (let x = -36; x <= 36; x += 18) s += ink(curve([[x, -296], [x + 4, -250], [x - 2, -204], [x + 3, -164]], 0.6), 1.6, { op: 0.3 });
     if (c.waistcoat) {
@@ -390,6 +425,17 @@
       s += sh(soft([[-58, -304], [-14, -300], [-8, bottom + 4], [-58, bottom]], 1.4), c.jacket) + sh(soft([[14, -300], [58, -304], [58, bottom], [8, bottom + 4]], 1.4), c.jacket);
       s += sh(soft([[-14, -300], [-30, -290], [-18, -240]], 0.6), c.lapel || c.jacket, { sw: 1.8 }) + sh(soft([[14, -300], [30, -290], [18, -240]], 0.6), c.lapel || c.jacket, { sw: 1.8 });
       if (c.doubleBreasted) [[-20, -230], [-20, -196], [20, -230], [20, -196]].forEach(([x, y]) => (s += `<circle cx="${x}" cy="${y}" r="3.2" fill="${P.ink}"/>`));
+    }
+    if (c.overalls) {
+      // Bib and straps of a pair of overalls, over the shirt.
+      s += sh(rect(-30, -262, 60, 100, 1.2), c.overalls) + sh(rect(-12, -248, 24, 18, 0.8), c.overalls, { sw: 1.6 });
+      s += ink(line(-26, -262, -40, -302, 0.3), 7, { stroke: c.overalls }) + ink(line(26, -262, 40, -302, 0.3), 7, { stroke: c.overalls });
+      s += `<circle cx="-24" cy="-256" r="3.5" fill="#d9b44a"/><circle cx="24" cy="-256" r="3.5" fill="#d9b44a"/>`;
+    }
+    if (c.bigCollar) {
+      // Wide pointed 1970s shirt collar, spread over the lapels.
+      s += sh(poly([[-6, -304], [-52, -296], [-34, -266], [-4, -292]], 0.6), c.bigCollar, { sw: 1.8 });
+      s += sh(poly([[6, -304], [52, -296], [34, -266], [4, -292]], 0.6), c.bigCollar, { sw: 1.8 });
     }
     if (c.coatOpen) {
       s += sh(soft([[-62, -306], [-16, -300], [-22, -92], [-70, -92]], 1.8), c.coatOpen) + sh(soft([[16, -300], [62, -306], [70, -92], [22, -92]], 1.8), c.coatOpen);
@@ -420,9 +466,35 @@
     if (c.hoodie) s += sh(rect(-26, -214, 52, 34, 1.5), c.top, { sw: 2 }) + ink(line(-6, -300, -8, -268, 0.5), 2) + ink(line(6, -300, 8, -268, 0.5), 2);
     if (c.stetho) s += ink(curve([[-20, -300], [-24, -250], [0, -232], [24, -250], [20, -300]], 0.8), 3, { stroke: "#2f3a40" }) + `<circle cx="0" cy="-228" r="7" fill="#9aa3a8" stroke="${P.ink}" stroke-width="2"/>`;
     if (c.lanyard) s += ink(curve([[-18, -302], [0, -250], [18, -302]], 0.5), 2.5, { stroke: P.rust }) + sh(rect(-10, -252, 20, 26, 1), "#f3efe4", { sw: 2 });
+    if (c.bowtie) s += sh(poly([[0, -300], [-18, -310], [-18, -290]], 0.4), c.bowtie, { sw: 1.8 }) + sh(poly([[0, -300], [18, -310], [18, -290]], 0.4), c.bowtie, { sw: 1.8 }) + `<circle cx="0" cy="-300" r="4" fill="${c.bowtie}" stroke="${P.ink}" stroke-width="1.5"/>`;
     // Arms
     s += arm("L", c) + arm("R", c);
-    if (c.watch) s += sh(rect(c.poseL === "pocket" ? -64 : -76, -196, 20, 12, 0.8), c.watch, { sw: 2 });
+    // Rings on the character's own hands. Facing the viewer, the left hand is on screen right:
+    // ringLeftHand draws on kit side "R", ringRightHand on kit side "L".
+    const ringAt = (side, stone) => {
+      const k = side === "L" ? -1 : 1;
+      const pose = (side === "L" ? c.poseL : c.poseR) || "down";
+      if (pose === "pocket" || pose === "up") return "";
+      const [x, y] = pose === "front" ? [k * 18, -208] : [k * 62, -166];
+      return `<ellipse cx="${x}" cy="${y + 1}" rx="9" ry="4" fill="none" stroke="#e2bd4e" stroke-width="3.4"/><circle cx="${x}" cy="${y - 4}" r="7" fill="${stone}" stroke="${P.ink}" stroke-width="1.8"/><circle cx="${x - 2.4}" cy="${y - 6.4}" r="2" fill="#ffffff" opacity=".85"/>`;
+    };
+    if (c.ringLeftHand) s += ringAt("R", c.ringLeftHand);
+    if (c.ringRightHand) s += ringAt("L", c.ringRightHand);
+    if (c.polaroid) {
+      // Polaroid SX-70 held at the chest, FlashBar standing on top (ten bulbs, used ones dark).
+      s += sh(rect(-34, -244, 68, 44, 1), "#2b2b2b", { sw: 2.5 }) + sh(rect(-34, -244, 68, 12, 0.6), "#b9bdc0", { sw: 2 });
+      s += `<circle cx="10" cy="-220" r="11" fill="#1a1a1c" stroke="#b9bdc0" stroke-width="3"/><circle cx="7" cy="-223" r="3" fill="#ffffff" opacity=".6"/>`;
+      s += sh(rect(-13, -322, 26, 80, 0.6), "#d9dcdf", { sw: 2.4 }) + sh(rect(-10, -318, 20, 72, 0.4), "#f3f1ea", { sw: 1 });
+      for (let b = 0; b < 10; b++) {
+        const used = b < (c.polaroidUsed || 0);
+        s += `<rect x="${b % 2 ? 1 : -8}" y="${-315 + Math.floor(b / 2) * 14}" width="7" height="11" rx="2" fill="${used ? "#4a4a4a" : "#fff6b8"}" stroke="#8a8a8a" stroke-width=".8"/>`;
+      }
+      s += sh(blob(-34, -214, 11, 12, 0.08, 8), c.skin) + sh(blob(34, -214, 11, 12, 0.08, 8), c.skin);
+    }
+    if (c.watch) {
+      const [wx, wy] = c.poseL === "front" ? [-38, -228] : [c.poseL === "pocket" ? -64 : -76, -196];
+      s += sh(rect(wx, wy, 20, 12, 0.8), c.watch, { sw: 2 });
+    }
     if (c.phone && c.poseR === "up") s += sh(rect(40, -378, 14, 28, 0.8), "#2b2b30", { sw: 2 });
     if (c.cane) {
       s += ink(line(-68, -168, -84, -2, 0.6), 6, { stroke: P.woodDark });
@@ -431,11 +503,20 @@
     if (c.bag) s += sh(soft([[44, -170], [92, -170], [96, -122], [40, -122]], 1.2), c.bag) + ink(curve([[56, -170], [68, -186], [80, -170]], 0.4), 3);
     if (c.sketchbook) s += sh(rect(-86, -232, 30, 44, 1), c.sketchbook);
     if (c.notebookHeld) s += sh(rect(54, -186, 24, 30, 1), c.notebookHeld);
+    if (c.clipboard) {
+      s += sh(rect(40, -222, 44, 58, 1), "#8a6a46") + sh(rect(44, -214, 36, 48, 0.6), "#f6f1e2", { sw: 1.4 }) + sh(rect(54, -226, 16, 8, 0.4), "#9aa0a6", { sw: 1.4 });
+      for (let y = -206; y < -172; y += 7) s += ink(line(48, y, 76, y, 0.2), 1, { op: 0.5 });
+    }
     if (c.cigCase) s += sh(rect(58, -180, 18, 12, 0.6), "#c9c9c4", { sw: 1.6 });
     if (c.mug) s += sh(rect(56, -196, 26, 30, 1.5), c.mug) + ink(curve([[82, -190], [92, -182], [82, -172]], 0.5), 3);
     if (c.towel) s += sh(soft([[30, -306], [58, -306], [62, -240], [44, -236]], 1.5), "#f2efe6") + ink(line(36, -280, 58, -280, 0.5), 2, { stroke: P.red });
     // Neck and head
     s += sh(rect(-12, -324, 24, 28, 1.5), c.skin, { sw: 2.5 });
+    if (c.highCollar) s += sh(soft([[-26, -332], [26, -332], [30, -298], [-30, -298]], 1), c.highCollar);
+    if (c.turtleneck) {
+      s += sh(soft([[-24, -330], [24, -330], [28, -298], [-28, -298]], 1.2), c.turtleneck);
+      for (let x = -18; x <= 18; x += 9) s += ink(line(x, -328, x, -300, 0.2), 1.2, { op: 0.35 });
+    }
     if (c.necklace) {
       const cols = ["#f2d36b", "#b9a0e0", "#84c98a", "#e98a7a", "#f2a6c8", "#8ec7e6"];
       for (let i = 0; i < 13; i++) {
@@ -469,7 +550,13 @@
     if (c.screwdriver) s += ink(line(48, -380, 62, -346, 0.3), 4, { stroke: P.red }) + ink(line(56, -362, 64, -340, 0.3), 2, { stroke: "#9aa0a6" });
     if (c.mustache) s += sh(soft([[-20, -336], [0, -342], [20, -336], [12, -332], [0, -336], [-12, -332]], 0.8), c.mustache);
     s += hairFront(c);
+    if (c.headband) s += sh(soft([[-48, -392], [-20, -402], [20, -402], [48, -392], [48, -382], [20, -392], [-20, -392], [-48, -382]], 0.8), c.headband);
     s += glasses(c);
+    if (c.headset) {
+      s += ink(curve([[-48, -366], [-34, -414], [0, -432], [34, -414], [48, -366]], 0.5), 5, { stroke: "#2c2c2c" });
+      s += `<ellipse cx="-48" cy="-360" rx="10" ry="14" fill="#3a3330" stroke="${P.ink}" stroke-width="2"/>`;
+      s += ink(curve([[-46, -348], [-40, -328], [-18, -322]], 0.3), 3, { stroke: "#2c2c2c" }) + `<ellipse cx="-14" cy="-322" rx="6" ry="4" fill="#2c2c2c"/>`;
+    }
     if (c.cap) s += sh(soft([[-46, -386], [-40, -416], [0, -426], [40, -416], [46, -386]], 1.5), c.cap) + sh(soft([[-10, -390], [60, -392], [64, -382], [-6, -380]], 1.5), c.cap);
     if (c.charlotte) s += sh(soft([[-50, -384], [-44, -420], [0, -432], [44, -420], [50, -384], [30, -392], [0, -396], [-30, -392]], 2.5), "#f6f3ec", { op: 0.95 }) + sh(rect(-48, -392, 96, 8, 1), "none", { sw: 1.5, op: 0.6 });
     if (c.hand === "chin") s += sh(soft([[60, -230], [30, -300], [14, -312], [6, -300], [26, -232]], 1.5), c.sleeve || c.top) + sh(blob(10, -312, 13, 12, 0.08, 9), c.skin);
@@ -512,6 +599,7 @@
       s += sh(soft([[-c.rx * 0.7, by - c.ry * 0.85], [c.rx * 0.55, by - c.ry * 0.95], [c.rx * 0.6, by + c.ry * 0.45], [-c.rx * 0.75, by + c.ry * 0.4]], 1.2), c.knitCoat);
       for (let i = -3; i <= 2; i++) s += ink(curve([[i * c.rx * 0.2, by - c.ry * 0.85], [i * c.rx * 0.2 + 3, by], [i * c.rx * 0.2, by + c.ry * 0.4]], 0.4), 1.4, { op: 0.35 });
     }
+    if (c.sparkle) for (let i = 0; i < 14; i++) s += `<circle cx="${f(-c.rx * 0.6 + rnd() * c.rx * 1.1)}" cy="${f(by - c.ry * 0.8 + rnd() * c.ry * 1.1)}" r="2.6" fill="${c.sparkle}" opacity=".9"/>`;
     if (c.stripe) s += ink(curve([[-c.rx * 0.85, by - c.ry * 0.7], [0, by - c.ry - 2], [c.rx * 0.8, by - c.ry * 0.75]], 0.8), 7, { stroke: c.stripe });
     if (c.pose === "lie") {
       s += sh(blob(c.rx * 0.6, -10, 24, 9, 0.06, 8), legCol) + sh(blob(-c.rx * 0.4, -10, 26, 9, 0.06, 8), legCol);
@@ -584,7 +672,7 @@
   function portrait(id, expr) {
     const key = id + ":" + (expr || "");
     if (portraitCache[key]) return portraitCache[key];
-    const over = { expr: expr || (id === "veronique" ? "smile" : "neutral") };
+    const over = { expr: expr || PEOPLE[id].expr || (id === "veronique" ? "smile" : "neutral") };
     if (id === "veronique" && expr === "focus") over.hand = "chin";
     if (id === "thibault") over.poseR = "down";
     const body = person(Object.assign({}, PEOPLE[id], over));

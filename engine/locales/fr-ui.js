@@ -93,6 +93,11 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "ui.rotate": `Tourne ton téléphone : l'enquête se mène à l'horizontale.`,
   "ui.menu_hint": `Tout est sauvegardé automatiquement.`,
   "ui.shelf": `Toutes les enquêtes`,
+  "ui.observations": `Observations`,
+  "ui.new_obs": `Observation : {title}`,
+  "ui.new_hypo": `Hypothèse : {title}`,
+  "ui.hypo": `Hypothèse`,
+  "ui.hypo_invalid": `Hypothèse invalidée`,
   "hyp.ask": `Et si c'était {who}, avec {weapon}, dans {room} ?`,
   "hyp.none": `Je ne peux rien vous dire contre ça.`,
 });

@@ -62,11 +62,6 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "ui.hyp_intro": `Choisis un suspect, un moment et une cachette. Si la personne peut contredire un élément, elle le dira.`,
   "hyp.ask": `Et si c'était {who}, {when}, avec le collier caché {where} ?`,
 
-  // ------------------------------------------------------------------ Final message (draft, Julien rewrites it)
-  "msg.title": `Pour Véro`,
-  "msg.body": `Véro,\n\nCe soir-là, tout le monde regardait ce qui brillait. Toi, tu as regardé comment ça brillait.\n\nC'est pour ça qu'on te confie toutes les enquêtes.`,
-  "msg.signature": `Julien`,
-
   // ------------------------------------------------------------------ Characters
   "chr.veronique.name": `Véronique`,
   "chr.biscotte.name": `Biscotte`,

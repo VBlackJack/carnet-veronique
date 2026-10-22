@@ -28,4 +28,9 @@ CH.shelf = [
     released: true,
     cover: "disco",
   },
+  {
+    id: "verre-de-minuit",
+    released: true,
+    cover: "glass",
+  },
 ];

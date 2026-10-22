@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+  Copyright 2026 Julien Bombled
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1c2230">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="icon" href="../../engine/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../engine/icon.svg">
+  <title>Le Verre de minuit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../engine/css/style.css?v=20261022.2018">
+</head>
+<body>
+  <svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+  <div id="app">
+    <div id="stage">
+      <div id="scene"></div>
+      <div id="paper"></div>
+      <div id="hotspots"></div>
+      <div id="hud" hidden>
+        <div class="hud-left">
+          <div id="act"></div>
+          <div id="objective"></div>
+        </div>
+        <div class="hud-right">
+          <button id="btnBoard" class="hud-btn" hidden></button>
+          <button id="btnNotebook" class="hud-btn"><span id="badge" hidden></span></button>
+          <button id="btnFull" class="hud-btn" hidden></button>
+          <button id="btnMenu" class="hud-btn"></button>
+        </div>
+      </div>
+      <div id="nav"></div>
+      <div id="biscotte" role="button" tabindex="0" hidden></div>
+      <div id="catcher" hidden></div>
+      <div id="dialog" class="dialog" hidden aria-live="polite"></div>
+      <div id="notebook" class="panel" hidden></div>
+      <div id="board" class="panel" hidden></div>
+      <div id="actcard"></div>
+      <div id="screen" class="screen" hidden></div>
+      <div id="toasts"></div>
+    </div>
+    <div id="rotate" aria-live="polite"></div>
+  </div>
+
+  <script>window.CH = { episode: { saveKey: "verre.save.v1", shelfUrl: "../../index.html" } };</script>
+  <script src="../../engine/js/config.js?v=20261022.2018"></script>
+  <script src="../../engine/locales/fr-ui.js?v=20261022.2018"></script>
+  <script src="locales/fr.js?v=20261022.2018"></script>
+  <script src="locales/fr-story.js?v=20261022.2018"></script>
+  <script src="../../engine/js/i18n.js?v=20261022.2018"></script>
+  <script src="../../engine/js/art/kit.js?v=20261022.2018"></script>
+  <script src="js/art/cast.js?v=20261022.2018"></script>
+  <script src="../../engine/js/scenes/registry.js?v=20261022.2018"></script>
+  <script src="js/scenes/murano-kit.js?v=20261022.2018"></script>
+  <script src="js/scenes/murano-scenes.js?v=20261022.2018"></script>
+  <script src="js/scenes/frame.js?v=20261022.2018"></script>
+  <script src="js/data/clues.js?v=20261022.2018"></script>
+  <script src="js/data/deductions.js?v=20261022.2018"></script>
+  <script src="js/data/cluedo.js?v=20261022.2018"></script>
+  <script src="js/data/characters.js?v=20261022.2018"></script>
+  <script src="js/data/story.js?v=20261022.2018"></script>
+  <script src="js/data/goals.js?v=20261022.2018"></script>
+  <script src="../../engine/js/cluedo.js?v=20261022.2018"></script>
+  <script src="../../engine/js/game.js?v=20261022.2018"></script>
+  <script src="../../engine/js/ui.js?v=20261022.2018"></script>
+  <script>CH.ui.init();</script>
+</body>
+</html>

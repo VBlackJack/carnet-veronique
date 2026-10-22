@@ -171,8 +171,8 @@
     // Brows
     const bl = ex === "focus" ? -373 : ex === "skeptic" ? -374 : -376;
     const br = ex === "skeptic" || ex === "amused" ? -384 : ex === "focus" ? -373 : -376;
-    s += ink(line(-26, bl + (ex === "focus" ? -2 : 0), -8, bl + (ex === "focus" ? 3 : 0), 0.5), 2.6, { stroke: c.browColor || P.ink });
-    s += ink(line(8, br + (ex === "focus" ? 3 : 0), 26, br + (ex === "focus" ? -2 : 0), 0.5), 2.6, { stroke: c.browColor || P.ink });
+    s += ink(line(-26, bl + (ex === "focus" ? -2 : 0), -8, bl + (ex === "focus" ? 3 : 0), 0.5), c.browWidth || 2.6, { stroke: c.browColor || P.ink });
+    s += ink(line(8, br + (ex === "focus" ? 3 : 0), 26, br + (ex === "focus" ? -2 : 0), 0.5), c.browWidth || 2.6, { stroke: c.browColor || P.ink });
     // Nose
     s += ink(curve([[2, -356], [6, -344], [0, -341]], 0.5), 2.2, { stroke: P.inkSoft });
     // Mouth
@@ -190,7 +190,7 @@
     // Cheeks
     s += sh(blob(-26, -343, 8, 5, 0.1, 8), c.blush || P.pink, { sw: 0, op: 0.45 });
     s += sh(blob(26, -343, 8, 5, 0.1, 8), c.blush || P.pink, { sw: 0, op: 0.45 });
-    if (c.mole) s += `<circle cx="9" cy="-318" r="2" fill="${P.inkSoft}"/>`;
+    if (c.mole) s += `<circle cx="9" cy="-318" r="${c.mole === "big" ? 3 : 2}" fill="${P.inkSoft}"/>`;
     if (c.freckles) {
       [[-30, -350], [-24, -346], [-34, -344], [-20, -351], [-28, -340], [30, -350], [24, -346], [34, -344], [20, -351], [28, -340], [-4, -350], [5, -349]].forEach(([x, y]) => (s += `<circle cx="${x}" cy="${y}" r="1.4" fill="#a8603e" opacity=".75"/>`));
     }
@@ -229,11 +229,12 @@
       return g(s, tilt);
     }
     const lensFill = gl.tint || "#ffffff", lensOp = gl.tint ? 'fill-opacity=".6"' : 'fill-opacity=".14"';
-    s += sh(soft([[-36, -374], [-6, -375], [-6, -352], [-12, -347], [-32, -347], [-37, -356]], 1), lensFill, { stroke: col, sw: w, op: 0.95, extra: lensOp });
-    s += sh(soft([[6, -375], [36, -374], [37, -356], [32, -347], [12, -347], [6, -352]], 1), lensFill, { stroke: col, sw: w, op: 0.95, extra: lensOp });
-    s += ink(line(-6, -368, 6, -368, 0.3), w * 0.8, { stroke: col });
-    s += ink(line(-37, -368, -44, -364, 0.3), w * 0.7, { stroke: col });
-    s += ink(line(37, -368, 44, -364, 0.3), w * 0.7, { stroke: col });
+    const [cl, cr, cb] = gl.multi || [col, col, col];
+    s += sh(soft([[-36, -374], [-6, -375], [-6, -352], [-12, -347], [-32, -347], [-37, -356]], 1), lensFill, { stroke: cl, sw: w, op: 0.95, extra: lensOp });
+    s += sh(soft([[6, -375], [36, -374], [37, -356], [32, -347], [12, -347], [6, -352]], 1), lensFill, { stroke: cr, sw: w, op: 0.95, extra: lensOp });
+    s += ink(line(-6, -368, 6, -368, 0.3), w * 0.8, { stroke: cb });
+    s += ink(line(-37, -368, -44, -364, 0.3), w * 0.7, { stroke: cl });
+    s += ink(line(37, -368, 44, -364, 0.3), w * 0.7, { stroke: cr });
     // Glint
     s += ink(line(-28, -369, -22, -372, 0.2), 2, { stroke: "#ffffff", op: 0.8 });
     if (gl.scratched) s += ink(curve([[12, -368], [22, -360], [30, -352]], 0.5), 1.2, { stroke: "#ffffff", op: 0.7 });
@@ -257,6 +258,8 @@
         return sh(soft([[-56, -390], [-62, -340], [-60, -318], [-44, -312], [44, -312], [60, -318], [62, -340], [56, -390], [0, -418]], 2), h);
       case "curly":
         return sh(blob(0, -372, 74, 66, 0.16, 18), h);
+      case "curlyShort":
+        return sh(blob(0, -386, 64, 42, 0.16, 16), h);
       default:
         return "";
     }
@@ -317,6 +320,7 @@
       case "bald":
         return sh(soft([[-46, -360], [-44, -380], [-38, -372]], 1), h) + sh(soft([[46, -360], [44, -380], [38, -372]], 1), h);
       case "curly":
+      case "curlyShort":
         // A fringe of small curls along the hairline.
         return [-40, -26, -12, 2, 16, 30, 42].map((x, i) => sh(blob(x, -398 - (i % 2) * 8, 13, 12, 0.12, 8), h, { sw: 2 })).join("");
       default:
@@ -345,7 +349,13 @@
       s += sh(blob(k * 14, -214, 12, 12, 0.08, 9), c.skin);
       return s;
     }
-    s += sh(soft([[k * 52, -300], [k * 68, -288], [k * 74, -184], [k * 56, -180], [k * 46, -276]], 1.5), sleeve);
+    if (c.rolled) {
+      s += sh(soft([[k * 53, -238], [k * 71, -242], [k * 74, -184], [k * 56, -180]], 1.5), c.skin);
+      s += sh(soft([[k * 52, -300], [k * 68, -288], [k * 72, -236], [k * 52, -232], [k * 46, -276]], 1.5), sleeve);
+      if (c.burns) s += sh(blob(k * 64, -214, 5, 3, 0.1, 7), "#c96a5a", { sw: 0, op: 0.7 }) + sh(blob(k * 62, -196, 4, 2.5, 0.1, 7), "#c96a5a", { sw: 0, op: 0.6 });
+    } else {
+      s += sh(soft([[k * 52, -300], [k * 68, -288], [k * 74, -184], [k * 56, -180], [k * 46, -276]], 1.5), sleeve);
+    }
     s += sh(blob(k * 65, -172, 12, 13, 0.08, 9), c.skin);
     return s;
   }
@@ -369,6 +379,10 @@
     } else if (c.skirt) {
       s += sh(soft([[-50, -170], [50, -170], [58, -40], [-58, -40]], 2), c.skirt);
       s += sh(rect(-30, -44, 18, 36, 1.5), c.legs || c.skin) + sh(rect(12, -44, 18, 36, 1.5), c.legs || c.skin);
+      if (c.legStripes) {
+        const cols = [].concat(c.legStripes);
+        for (let y = -40, i = 0; y < -10; y += 8, i++) s += sh(rect(-29, y, 16, 4, 0.3), cols[i % cols.length], { sw: 0 }) + sh(rect(13, y, 16, 4, 0.3), cols[i % cols.length], { sw: 0 });
+      }
     } else if (c.flares) {
       s += sh(soft([[-40, -172], [-6, -172], [-6, -90], [-2, -12], [-50, -12], [-38, -90]], 1.5), c.pants);
       s += sh(soft([[6, -172], [40, -172], [38, -90], [50, -12], [2, -12], [6, -90]], 1.5), c.pants);
@@ -410,6 +424,32 @@
         s += `<circle cx="${f(x)}" cy="${f(y)}" r="2.4" fill="${c.sequins}" opacity=".85"/>`;
       }
     }
+    if (c.dots) {
+      const cols = [].concat(c.dots), r = c.dotSize || 5;
+      const spots = c.overalls ? [] : [[-34, -280], [-6, -268], [24, -284], [38, -240], [-40, -230], [8, -228], [-22, -196], [30, -196], [-4, -176]];
+      if (c.skirt || c.longSkirt) spots.push([-38, -140], [-10, -120], [22, -136], [44, -100], [-30, -80], [4, -70], [32, -60], [-48, -50]);
+      spots.forEach(([x, y], i) => (s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${cols[i % cols.length]}" opacity=".9"/>`));
+    }
+    if (c.leatherApron) {
+      s += sh(soft([[-36, -280], [36, -280], [48, -56], [-48, -56]], 1.6), c.leatherApron);
+      s += ink(line(-30, -280, -40, -304, 0.3), 4, { stroke: c.leatherApron }) + ink(line(30, -280, 40, -304, 0.3), 4, { stroke: c.leatherApron });
+      s += ink(curve([[-30, -150], [0, -146], [30, -150]], 0.6), 1.4, { op: 0.4 }) + sh(blob(14, -112, 7, 5, 0.1, 7), "#3a2a20", { sw: 0, op: 0.35 });
+    }
+    if (c.braces) s += ink(line(-30, -302, -22, -162, 0.4), 6, { stroke: c.braces }) + ink(line(30, -302, 22, -162, 0.4), 6, { stroke: c.braces });
+    if (c.shawl) {
+      s += sh(soft([[-66, -306], [66, -306], [62, -258], [0, -196], [-62, -258]], 1.5), c.shawl);
+      for (let i = 0; i < 9; i++) {
+        const t = i / 8, x = -60 + t * 120, y = t < 0.5 ? -258 + t * 2 * 62 : -196 - (t - 0.5) * 2 * 62;
+        s += `<circle cx="${f(x)}" cy="${f(y + 4)}" r="5" fill="${c.shawl}" stroke="${P.ink}" stroke-width="1.2"/>`;
+      }
+      [[-40, -284], [-20, -262], [0, -240], [20, -262], [40, -284], [-10, -290], [10, -290], [0, -220]].forEach(([x, y]) => (s += `<circle cx="${x}" cy="${y}" r="2.2" fill="#ffffff" opacity=".45"/>`));
+    }
+    if (c.guitar) {
+      s += ink(line(-44, -302, 44, -150, 0.4), 4, { stroke: "#5a3a26" });
+      s += sh(soft([[-56, -318], [-44, -326], [10, -228], [-2, -222]], 0.8), "#4a3020");
+      s += sh(blob(14, -190, 30, 26, 0.05, 10), c.guitar) + sh(blob(36, -156, 38, 32, 0.05, 10), c.guitar);
+      s += `<circle cx="22" cy="-176" r="9" fill="#2a1e18"/>` + ink(line(-50, -320, 34, -150, 0.2), 1, { stroke: "#efe4cf", op: 0.8 });
+    }
     if (c.vneck || c.openShirt) s += sh(soft([[-16, -302], [0, c.openShirt ? -250 : -272], [16, -302]], 0.5), c.skin, { sw: 2 });
     if (c.goldChain) s += ink(curve([[-14, -300], [0, -272], [14, -300]], 0.3), 2.2, { stroke: "#d9b44a" });
     if (c.shirtCollar) s += sh(soft([[-16, -304], [0, -282], [-4, -300]], 0.4), c.shirtCollar, { sw: 1.8 }) + sh(soft([[16, -304], [0, -282], [4, -300]], 0.4), c.shirtCollar, { sw: 1.8 });
@@ -431,6 +471,7 @@
       s += sh(rect(-30, -262, 60, 100, 1.2), c.overalls) + sh(rect(-12, -248, 24, 18, 0.8), c.overalls, { sw: 1.6 });
       s += ink(line(-26, -262, -40, -302, 0.3), 7, { stroke: c.overalls }) + ink(line(26, -262, 40, -302, 0.3), 7, { stroke: c.overalls });
       s += `<circle cx="-24" cy="-256" r="3.5" fill="#d9b44a"/><circle cx="24" cy="-256" r="3.5" fill="#d9b44a"/>`;
+      if (c.dots) [[-14, -226], [14, -212], [-12, -186], [16, -178]].forEach(([x, y], i) => (s += `<circle cx="${x}" cy="${y}" r="${c.dotSize || 5}" fill="${[].concat(c.dots)[(i + 3) % [].concat(c.dots).length]}" opacity=".9"/>`));
     }
     if (c.bigCollar) {
       // Wide pointed 1970s shirt collar, spread over the lapels.
@@ -466,6 +507,13 @@
     if (c.hoodie) s += sh(rect(-26, -214, 52, 34, 1.5), c.top, { sw: 2 }) + ink(line(-6, -300, -8, -268, 0.5), 2) + ink(line(6, -300, 8, -268, 0.5), 2);
     if (c.stetho) s += ink(curve([[-20, -300], [-24, -250], [0, -232], [24, -250], [20, -300]], 0.8), 3, { stroke: "#2f3a40" }) + `<circle cx="0" cy="-228" r="7" fill="#9aa3a8" stroke="${P.ink}" stroke-width="2"/>`;
     if (c.lanyard) s += ink(curve([[-18, -302], [0, -250], [18, -302]], 0.5), 2.5, { stroke: P.rust }) + sh(rect(-10, -252, 20, 26, 1), "#f3efe4", { sw: 2 });
+    if (c.lavalliere) {
+      const col = c.lavalliere;
+      s += sh(soft([[0, -300], [-30, -316], [-34, -290], [-6, -294]], 0.8), col) + sh(soft([[0, -300], [30, -316], [34, -290], [6, -294]], 0.8), col);
+      s += sh(soft([[-4, -298], [-16, -260], [-8, -250], [2, -294]], 0.8), col) + sh(soft([[4, -298], [14, -256], [6, -248], [-2, -294]], 0.8), col);
+      s += `<circle cx="0" cy="-300" r="6" fill="${col}" stroke="${P.ink}" stroke-width="1.8"/>`;
+    }
+    if (c.glassesOnCollar) s += `<g fill="#ffffff" fill-opacity=".2" stroke="${c.glassesOnCollar}" stroke-width="2.6"><circle cx="-11" cy="-256" r="9"/><circle cx="11" cy="-256" r="9"/></g>` + ink(line(-2, -258, 2, -258, 0.2), 2.4, { stroke: c.glassesOnCollar });
     if (c.bowtie) s += sh(poly([[0, -300], [-18, -310], [-18, -290]], 0.4), c.bowtie, { sw: 1.8 }) + sh(poly([[0, -300], [18, -310], [18, -290]], 0.4), c.bowtie, { sw: 1.8 }) + `<circle cx="0" cy="-300" r="4" fill="${c.bowtie}" stroke="${P.ink}" stroke-width="1.5"/>`;
     // Arms
     s += arm("L", c) + arm("R", c);
@@ -506,6 +554,25 @@
     if (c.clipboard) {
       s += sh(rect(40, -222, 44, 58, 1), "#8a6a46") + sh(rect(44, -214, 36, 48, 0.6), "#f6f1e2", { sw: 1.4 }) + sh(rect(54, -226, 16, 8, 0.4), "#9aa0a6", { sw: 1.4 });
       for (let y = -206; y < -172; y += 7) s += ink(line(48, y, 76, y, 0.2), 1, { op: 0.5 });
+    }
+    if (c.fan) {
+      const fx = c.poseR === "front" ? 18 : 64, fy = c.poseR === "front" ? -214 : -172;
+      let fan = "";
+      for (let i = 0; i < 7; i++) {
+        const a = (-150 + i * 20) * Math.PI / 180;
+        fan += `<path d="M${fx} ${fy}L${f(fx + Math.cos(a) * 54)} ${f(fy + Math.sin(a) * 54)}L${f(fx + Math.cos(a + 0.35) * 54)} ${f(fy + Math.sin(a + 0.35) * 54)}Z" fill="${i % 2 ? c.fan : "#f3ece0"}" stroke="${P.ink}" stroke-width="1.4"/>`;
+      }
+      s += fan + sh(blob(fx, fy, 11, 11, 0.08, 8), c.skin);
+    }
+    if (c.blowpipe) {
+      s += ink(line(-60, -372, -80, -24, 0.4), 7, { stroke: "#4a4a4e" }) + ink(line(-60, -372, -66, -260, 0.2), 9, { stroke: P.woodDark });
+      s += `<circle cx="-81" cy="-20" r="16" fill="#ffb347" opacity=".35"/>` + sh(blob(-81, -20, 10, 9, 0.08, 8), "#ff8a3a", { sw: 1.6 });
+    }
+    if (c.biscuit) {
+      const [bx, by] = c.poseL === "front" ? [-20, -230] : [-66, -192];
+      let bis = sh(soft([[bx - 14, by + 10], [bx - 10, by - 10], [bx - 2, by - 8], [bx, by - 22], [bx + 8, by - 20], [bx + 6, by - 6], [bx + 16, by - 2], [bx + 14, by + 12]], 0.8), "#c98a4a", { sw: 1.8 });
+      [[bx - 6, by], [bx + 6, by + 4], [bx + 3, by - 14]].forEach(([x, y], i) => (bis += `<circle cx="${x}" cy="${y}" r="2.4" fill="${["#e65a7a", "#f6f1e6", "#6ab0e0"][i]}"/>`));
+      s += g(bis, `transform="translate(${bx},${by}) scale(1.7) translate(${-bx},${-by})"`);
     }
     if (c.cigCase) s += sh(rect(58, -180, 18, 12, 0.6), "#c9c9c4", { sw: 1.6 });
     if (c.mug) s += sh(rect(56, -196, 26, 30, 1.5), c.mug) + ink(curve([[82, -190], [92, -182], [82, -172]], 0.5), 3);
@@ -552,6 +619,32 @@
     s += hairFront(c);
     if (c.headband) s += sh(soft([[-48, -392], [-20, -402], [20, -402], [48, -392], [48, -382], [20, -392], [-20, -392], [-48, -382]], 0.8), c.headband);
     s += glasses(c);
+    if (c.brushes) [[-18, -440, -2, -404], [8, -446, 6, -406], [30, -436, 14, -404]].forEach(([x1, y1, x2, y2], i) => {
+      s += ink(line(x1, y1, x2, y2, 0.2), 4, { stroke: P.woodLight }) + `<circle cx="${x1}" cy="${y1}" r="4" fill="${[P.teal, P.rust, P.mustard][i]}" stroke="${P.ink}" stroke-width="1.2"/>`;
+    });
+    if (c.hat) {
+      const h = c.hat;
+      if (h.kind === "bowler") {
+        s += sh(soft([[-44, -404], [-42, -440], [-22, -460], [22, -460], [42, -440], [44, -404]], 1), h.color);
+        s += sh(soft([[-64, -402], [-50, -394], [50, -394], [64, -402], [50, -410], [-50, -410]], 0.8), h.color);
+        s += sh(rect(-43, -418, 86, 9, 0.4), h.band || "#1f1a18", { sw: 1.4 });
+      } else if (h.kind === "wide") {
+        s += sh(soft([[-112, -404], [-60, -390], [60, -390], [112, -404], [70, -420], [-70, -420]], 1.4), h.color);
+        s += sh(soft([[-46, -414], [-42, -452], [-14, -466], [18, -466], [44, -452], [46, -414]], 1), h.color);
+        s += sh(rect(-46, -428, 92, 12, 0.5), h.band || P.plum, { sw: 1.4 });
+        if (h.feather) s += sh(soft([[30, -430], [60, -490], [84, -500], [70, -470], [44, -428]], 1), h.feather) + ink(curve([[34, -430], [62, -478], [80, -496]], 0.3), 1.4, { op: 0.6 });
+        if (h.flowers) [[-30, -432], [-14, -436], [-38, -420]].forEach(([x, y], i) => (s += `<circle cx="${x}" cy="${y}" r="8" fill="${h.flowers[i % h.flowers.length]}" stroke="${P.ink}" stroke-width="1.4"/>`));
+      } else if (h.kind === "beret") {
+        s += sh(blob(10, -420, 58, 20, 0.06, 12), h.color) + sh(blob(10, -440, 5, 5, 0.1, 6), h.color);
+        if (h.flower) {
+          for (let i = 0; i < 5; i++) {
+            const a = (i * 72) * Math.PI / 180;
+            s += `<circle cx="${f(-26 + Math.cos(a) * 8)}" cy="${f(-424 + Math.sin(a) * 8)}" r="6" fill="${h.flower}" stroke="${P.ink}" stroke-width="1.2"/>`;
+          }
+          s += `<circle cx="-26" cy="-424" r="4.5" fill="${h.heart || "#f2d36b"}" stroke="${P.ink}" stroke-width="1.2"/>`;
+        }
+      }
+    }
     if (c.headset) {
       s += ink(curve([[-48, -366], [-34, -414], [0, -432], [34, -414], [48, -366]], 0.5), 5, { stroke: "#2c2c2c" });
       s += `<ellipse cx="-48" cy="-360" rx="10" ry="14" fill="#3a3330" stroke="${P.ink}" stroke-width="2"/>`;
@@ -612,6 +705,7 @@
     const hy = graze ? by + c.ry + 10 : by - c.ry - 40;
     s += sh(soft([[nx - 26, ny - 6], [nx + 6, ny - 22], [hx - 8, hy - 8], [hx + 6, hy + 10], [nx + 22, ny + 18]], 1.2), c.coat);
     if (c.collar) s += ink(line(nx - 4, ny - 18, nx + 16, ny + 4, 0.5), 7, { stroke: c.collar });
+    if (c.neckerchief) s += sh(soft([[nx - 8, ny - 22], [nx + 22, ny + 2], [nx - 4, ny + 26]], 0.8), c.neckerchief, { sw: 2 }) + `<circle cx="${f(nx + 4)}" cy="${f(ny - 6)}" r="4" fill="${c.neckerchief}" stroke="${P.ink}" stroke-width="1.4"/>`;
     // The outer group places the head; the inner one is free for CSS animation,
     // which would otherwise replace the placement transform.
     s += g(g(head(c), 'class="g-head"'), `transform="translate(${f(hx)},${f(hy)}) scale(${c.hs}) rotate(${graze ? 50 : 0})"`);
@@ -650,6 +744,32 @@
   };
   const namedGoat = (name, x, y, scale, flip, overrides = {}, extra = "") =>
     goatAt(Object.assign({}, GOATS[name], overrides), x, y, scale, flip, extra);
+
+  // ---------- Cats ----------
+  // Local coordinates: lying on y=0, facing right.
+
+  function cat(o) {
+    const c = Object.assign({ coat: "#d98a3a", white: "#f6f1e6", stripes: "#b5662a", seed: 91 }, o);
+    srand(c.seed);
+    let s = "";
+    // Tail curled around the front.
+    s += ink(curve([[-46, -18], [-60, -2], [-30, 6], [20, 4], [44, -2]], 0.6), 14, { stroke: P.ink }) + ink(curve([[-46, -18], [-60, -2], [-30, 6], [20, 4], [44, -2]], 0.6), 10, { stroke: c.coat });
+    s += sh(blob(-4, -26, 50, 26, 0.05, 12), c.coat);
+    for (let i = 0; i < 4; i++) s += ink(curve([[-36 + i * 16, -48], [-30 + i * 16, -34], [-34 + i * 16, -22]], 0.5), 4, { stroke: c.stripes, op: 0.8 });
+    s += sh(blob(30, -12, 18, 9, 0.08, 8), c.white);
+    // Head resting on the paws.
+    s += sh(soft([[30, -40], [34, -66], [44, -50]], 0.6), c.coat) + sh(soft([[52, -50], [62, -68], [64, -44]], 0.6), c.coat);
+    s += sh(blob(48, -32, 21, 18, 0.06, 10), c.coat);
+    s += sh(blob(54, -24, 12, 9, 0.08, 8), c.white, { sw: 0 });
+    s += ink(curve([[38, -36], [42, -33], [46, -36]], 0.2), 2) + ink(curve([[52, -36], [56, -33], [60, -36]], 0.2), 2);
+    s += `<circle cx="54" cy="-27" r="2.4" fill="#d98f8a"/>`;
+    return s;
+  }
+
+  const CATS = {
+    tobiasse: { coat: "#d98a3a", white: "#f6f1e6", stripes: "#b5662a", seed: 93 },
+  };
+  const namedCat = (name, x, y, scale, flip, overrides = {}) => g(cat(Object.assign({}, CATS[name], overrides)), tr(x, y, scale, flip));
 
   // ---------- Characters ----------
   const PEOPLE = {
@@ -734,7 +854,7 @@
 
   CH.art = {
     P, srand, rnd, jit, smooth, blob, poly, rect, soft, curve, line, sh, ink, g, tr, text,
-    defs, person, figure, character, portrait, goat, goatAt, namedGoat, goatPortrait,
+    defs, person, figure, character, portrait, goat, goatAt, namedGoat, goatPortrait, cat, namedCat, CATS,
     leaves, mist, dust, steam, hills, PEOPLE, GOATS,
   };
 })();

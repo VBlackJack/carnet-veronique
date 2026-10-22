@@ -60,7 +60,6 @@
       { egg: "dalle" },
       { bg: "cuisine2026" },
       { l: "cut.finale.retour" },
-      { screen: "message" },
       { flag: "finished" },
       { screen: "bilan" },
       { screen: "end" },

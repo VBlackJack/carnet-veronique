@@ -66,7 +66,7 @@
       // The master's bench (scagno) with the water globe and the wine bottle
       back += sh(rect(1190, 590, 260, 26, 1), M.wood) + ink(line(1210, 616, 1206, 700, 0.3), 8, { stroke: M.woodDark }) + ink(line(1430, 616, 1434, 700, 0.3), 8, { stroke: M.woodDark });
       back += K.waterGlobe(1280, 480, { flipped: true });
-      back += sh(rect(1410, 520, 22, 70, 0.6), "#2a4a2a", { sw: 2 }) + sh(rect(1414, 500, 14, 22, 0.4), "#2a4a2a", { sw: 1.6 }) + sh(rect(1413, 494, 16, 8, 0.3), "#8a6a4a", { sw: 1.2 });
+      back += sh(rect(1196, 520, 22, 70, 0.6), "#2a4a2a", { sw: 2 }) + sh(rect(1200, 500, 14, 22, 0.4), "#2a4a2a", { sw: 1.6 }) + sh(rect(1199, 494, 16, 8, 0.3), "#8a6a4a", { sw: 1.2 });
       // Annealing oven at the back right, Tobiasse asleep on its warm bricks
       back += K.arca(1180, 330, 400);
       back += A.namedCat("tobiasse", 1300, 316, 1.1);
@@ -93,7 +93,7 @@
       { id: "gloria", x: 650, y: 510, w: 140, h: 150, look: [L("hs.fornace.gloria.look")] },
       { id: "horloge", x: 1170, y: 120, w: 130, h: 150, look: [L("hs.fornace.horloge.look")] },
       { id: "arca", x: 1180, y: 260, w: 400, h: 240, look: [L("hs.fornace.arca.look"), { egg: "tobiasse" }] },
-      { id: "bouteille", x: 1400, y: 490, w: 50, h: 100, look: [L("hs.fornace.bouteille.look"), { clue: "o_vin" }] },
+      { id: "bouteille", x: 1182, y: 486, w: 46, h: 108, look: [L("hs.fornace.bouteille.look"), { clue: "o_vin" }] },
     ],
   });
 

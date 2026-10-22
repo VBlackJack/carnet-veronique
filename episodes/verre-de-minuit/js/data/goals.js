@@ -77,6 +77,9 @@
     morosini: [
       clue("c_carnet_julien", chr("benjamin")),
       deduce("d_mensonge", "c_morosini_soir", "c_carnet_julien"),
+      { ...deduce("d_horloge", "c_carnet_julien", "c_cloches"), ready: (s) => has(s, "c_cloches") },
+      clue("c_chanson", chr("bernard")),
+      deduce("d_pleine_voix", "c_morosini_soir", "c_chanson"),
       clue("c_vitrine_vide", hs("musee", "vitrine", true)),
       { id: "eclat", done: (s) => has(s, "c_eclat"), target: () => ({ kind: "biscotte" }) },
       deduce("d_eclat", "c_eclat", "c_vitrine_vide"),

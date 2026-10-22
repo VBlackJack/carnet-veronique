@@ -48,6 +48,8 @@
     rev1: [{ go: "echantillons" }, { l: "board.b1.ok" }, { l: "cut.rev1" }, { act: A.crossCheck }, { l: "cut.act3" }],
     sonnerie: [{ go: "fornace" }, { l: "cut.sonnerie" }, { clue: "c_carnet_julien" }],
     rev2: [{ l: "cut.rev2" }],
+    // The clock deduction found after the liar: the revelation has already played.
+    horloge: [{ if: (s) => !ded(s, "d_mensonge"), then: [{ l: "cut.rev2" }] }],
     // The liar first: the clock revelation plays here if it has not played yet.
     mensonge: [{ if: (s) => !ded(s, "d_horloge"), then: [{ l: "cut.rev2" }] }, { l: "cut.mensonge" }],
     chute: [{ l: "cut.chute" }],
@@ -70,7 +72,8 @@
   // Rules fire once, in order, after every action.
   const RULES = [
     { id: "r_act2", when: (s) => s.act === A.night && VERSIONS.every((c) => has(s, c)) && ded(s, "h_coup"), steps: [{ cut: "act2" }] },
-    { id: "r_nez", when: (s) => s.act >= A.night && s.act < A.ending && (s.scene === "cour" || s.scene === "fondamenta"), steps: [{ cut: "nez" }] },
+    // The red-nose gag plays after the first exchange with Bernardo or Francesca.
+    { id: "r_nez", when: (s) => s.act < A.ending && Object.keys(s.seen).some((k) => k.startsWith("t:bernard:") || k.startsWith("t:francoise:")), steps: [{ cut: "nez" }] },
   ];
 
   // Answer index for each blank, in locale option order.

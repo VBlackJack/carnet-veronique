@@ -33,7 +33,7 @@
     { id: "d_salon", pairs: [["c_ottavio_aveu", "c_barbaro_soir"], ["c_ottavio_aveu", "c_lowell_soir"]], requires: ["d_avant_minuit"], failKey: "combo.need.creneau" },
     { id: "d_amoureux", pairs: [["c_parapluie", "c_cloches"], ["c_parapluie", "c_nane_soir"]] },
     // Branch D: Morosini
-    { id: "d_horloge", pairs: [["c_carnet_julien", "c_cloches"]], cut: "rev2" },
+    { id: "d_horloge", pairs: [["c_carnet_julien", "c_cloches"]], cut: "horloge" },
     { id: "d_mensonge", pairs: [["c_morosini_soir", "c_carnet_julien"]], cut: "mensonge" },
     { id: "d_pleine_voix", pairs: [["c_morosini_soir", "c_chanson"]] },
     { id: "d_eclat", pairs: [["c_eclat", "c_vitrine_vide"]] },

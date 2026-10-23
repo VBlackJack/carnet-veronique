@@ -338,6 +338,8 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "hint.char.3": `Biscotte va s'asseoir aux pieds {ofName}, {inPlace}, et ne bouge plus.`,
   "hint.show.2": `Biscotte tire Véronique par la manche vers {inline}, la fiche "{card}" entre les dents.`,
   "hint.show.3": `Biscotte va s'asseoir aux pieds {ofName}, {inPlace}, et lâche la fiche "{card}" sur ses chaussures. Il faut la lui montrer.`,
+  "hint.charpro.2": `Biscotte tire Véronique par la manche vers {inline}, puis lui tapote les lunettes du bout du nez.`,
+  "hint.charpro.3": `Biscotte va s'asseoir aux pieds {ofName}, {inPlace}, et pousse du nez les petites lunettes posées à côté. Un regard d'opticienne, de très près.`,
   "hint.ded.2": `Biscotte pose une patte sur la fiche {a}.`,
   "hint.ded.3": `Biscotte pose une patte sur la fiche {a}, l'autre sur la fiche {b}. Il attend.`,
   "hint.missing": `Biscotte renifle le carnet et secoue la tête : il manque encore une fiche.`,

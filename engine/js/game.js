@@ -30,7 +30,7 @@
     return {
       v: SAVE_VERSION, act: C.acts.opening, scene: ST().FIRST_SCENE,
       flags: {}, clues: {}, clueOrder: [], deds: {}, dedOrder: [], items: {}, eggs: {}, marks: {}, crossed: {},
-      fresh: {}, seen: {}, hintLevels: {}, biscuits: 0, tries: {}, hyps: 0, playMs: 0, genericIdx: 0,
+      fresh: {}, seen: {}, hintLevels: {}, hintTargets: {}, biscuits: 0, tries: {}, hyps: 0, playMs: 0, genericIdx: 0,
     };
   }
 
@@ -379,6 +379,8 @@
         const pres = CH.chars.get(target.id).presence(s);
         const p = Object.assign(nameParams(target.id), pres ? placeParams(pres.scene) : { place: "", placeLc: "", inPlace: "" });
         // A hint that asks to show a card names it, when the episode has the template.
+        // A hint that asks for a professional look at someone says so.
+        if (target.pro && CH.i18n.has(`hint.charpro.${level}`)) return CH.t(`hint.charpro.${level}`, p);
         if (target.card && CH.i18n.has(`hint.show.${level}`)) return CH.t(`hint.show.${level}`, Object.assign(p, { card: CH.t(`clue.${target.card}.title`) }));
         return CH.t(`hint.char.${level}`, p);
       }
@@ -411,8 +413,14 @@
   async function giveHint() {
     const goal = CH.goals.current(s);
     if (!goal) return run([{ l: "hint.none" }]);
-    const level = s.hintLevels[goal.id] || 0;
     const target = goal.target(s);
+    // A goal played in several steps starts its hints over each time its target moves on.
+    const targetKey = JSON.stringify(target);
+    if (s.hintTargets[goal.id] !== targetKey) {
+      s.hintTargets[goal.id] = targetKey;
+      s.hintLevels[goal.id] = 0;
+    }
+    const level = s.hintLevels[goal.id] || 0;
     if (level >= C.hint.maxLevel) {
       CH.ui.highlight(target);
       return run([{ l: "hint.maxed" }]);

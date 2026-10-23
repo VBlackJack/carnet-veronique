@@ -22,7 +22,7 @@
   const AC = CH.config.acts;
   const ded = (s, id) => !!s.deds[id];
   const hs = (scene, id, pro = false) => ({ kind: "hs", scene, id, pro });
-  const chr = (id, pro = false) => ({ kind: "char", id, pro });
+  const chr = (id, pro = false, card = null) => ({ kind: "char", id, pro, card });
   const cards = (a, b) => ({ kind: "ded", a, b });
   const clue = (id, target) => ({ id, done: (s) => has(s, id), target: () => target });
   const deduce = (id, a, b) => ({ id, done: (s) => ded(s, id), target: () => cards(a, b) });
@@ -55,7 +55,7 @@
       clue("c_braises", chr("nane")),
       deduce("d_avant_minuit", "c_verre_fendu", "c_braises"),
       clue("c_lowell_escalier", chr("benjamin")),
-      clue("c_lowell_aveu", chr("lowell")),
+      clue("c_lowell_aveu", chr("lowell", false, "c_lowell_escalier")),
       deduce("d_lowell_vivant", "c_lowell_aveu", "c_lowell_escalier"),
     ],
     how: [
@@ -66,12 +66,12 @@
     ],
     alibis: [
       clue("c_contrat", chr("ottavio", true)),
-      clue("c_ottavio_aveu", chr("ottavio")),
+      clue("c_ottavio_aveu", chr("ottavio", false, "c_contrat")),
       // Needs the time window first: the branch waits for branch A.
       { ...deduce("d_salon", "c_ottavio_aveu", "c_barbaro_soir"), ready: (s) => ded(s, "d_avant_minuit") },
       clue("c_atelier_froid", hs("atelier", "palette", true)),
       clue("c_cloches", chr("bernard")),
-      clue("c_parapluie", chr("elena")),
+      clue("c_parapluie", chr("elena", false, "c_atelier_froid")),
       deduce("d_amoureux", "c_parapluie", "c_cloches"),
     ],
     morosini: [

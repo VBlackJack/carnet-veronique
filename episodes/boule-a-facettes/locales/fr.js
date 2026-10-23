@@ -123,6 +123,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "scene.scene.name": `La scène`,
   "scene.scene.in": `sur la scène`,
   "scene.bar.name": `Le bar`,
+  "scene.bar.in": `au bar`,
   "scene.loge.name": `La loge`,
   "scene.cabine.name": `La cabine`,
   "scene.regie.name": `La régie`,

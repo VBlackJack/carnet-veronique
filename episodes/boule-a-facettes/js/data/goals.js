@@ -22,7 +22,7 @@
   const AC = CH.config.acts;
   const ded = (s, id) => !!s.deds[id];
   const hs = (scene, id, pro = false) => ({ kind: "hs", scene, id, pro });
-  const chr = (id, pro = false) => ({ kind: "char", id, pro });
+  const chr = (id, pro = false, card = null) => ({ kind: "char", id, pro, card });
   const cards = (a, b) => ({ kind: "ded", a, b });
   const clue = (id, target) => ({ id, done: (s) => has(s, id), target: () => target });
   const deduce = (id, a, b) => ({ id, done: (s) => ded(s, id), target: () => cards(a, b) });
@@ -54,11 +54,11 @@
     when: [
       clue("c_ecrin_ouvert", chr("stella")),
       clue("c_paillettes_violettes", hs("loge", "porte_couloir", true)),
-      clue("c_coco_loge", chr("coco")),
+      clue("c_coco_loge", chr("coco", false, "c_paillettes_violettes")),
       deduce("d_creneau", "c_ecrin_ouvert", "c_coco_loge"),
       clue("c_henri_tel", chr("lulu")),
       deduce("d_henri", "c_henri_tel", "c_henri_soir"),
-      clue("c_henri_croise", chr("henri")),
+      clue("c_henri_croise", chr("henri", false, "c_coco_loge")),
       deduce("d_coco", "c_coco_loge", "c_henri_croise"),
       deduce("d_sylvie", "c_polas", "c_sylvie_soir"),
       deduce("d_ray", "c_polas", "c_bague_ray"),

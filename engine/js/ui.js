@@ -24,6 +24,8 @@
 
   const GLASSES_ICON = `<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M3 6h13v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zM24 6h13v8a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3zM16 9h8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg>`;
 
+  const LOUPE_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M14.5 14.5L20 20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>`;
+
   const el = {};
   let backdrop = null;
   let lastSceneKey = "";
@@ -36,6 +38,10 @@
   let pendingHighlight = null;
   let highlightTimer = null;
   let hintCards = [];
+  let lastSceneId = "";
+  let revealTimer = null;
+  let viewer = null;
+  const coarse = () => !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 
   const $ = (sel) => document.querySelector(sel);
   const S = () => CH.game.state;
@@ -52,6 +58,7 @@
     });
     el.btnMenu.addEventListener("click", () => !CH.game.busy && showTitle());
     setupFullscreen();
+    setupReveal();
     el.biscotte.addEventListener("click", () => !CH.game.busy && CH.game.biscotte());
     el.biscotte.addEventListener("keydown", (e) => {
       if ((e.key === "Enter" || e.key === " ") && !CH.game.busy) {
@@ -125,6 +132,61 @@
     updateFullscreenButton();
   }
 
+  // ---------------------------------------------------------------- Hotspot reveal
+  // Hotspots only light up under a mouse; on a touch screen nothing shows where to tap.
+  // They are outlined briefly when a scene opens, and on demand with the magnifier.
+  function setupReveal() {
+    const btn = document.createElement("button");
+    btn.id = "btnReveal";
+    btn.className = "hud-btn";
+    btn.innerHTML = LOUPE_ICON;
+    btn.title = t("ui.reveal");
+    btn.setAttribute("aria-label", btn.title);
+    btn.addEventListener("click", () => !CH.game.busy && revealHotspots(C.reveal.onDemandMs, true));
+    el.btnNotebook.parentNode.insertBefore(btn, el.btnNotebook);
+  }
+
+  function revealHotspots(ms, labels) {
+    clearTimeout(revealTimer);
+    clearRevealLabels();
+    el.hotspots.classList.add("reveal");
+    if (labels) placeRevealLabels();
+    revealTimer = setTimeout(() => {
+      el.hotspots.classList.remove("reveal");
+      clearRevealLabels();
+    }, ms);
+  }
+
+  function clearRevealLabels() {
+    el.hotspots.querySelectorAll(".reveal-label").forEach((n) => n.remove());
+  }
+
+  // Every label is placed above its hotspot, else below, else inside, else lower and
+  // lower: the first spot that stays on stage and clear of the HUD and other labels.
+  function placeRevealLabels() {
+    const box = el.hotspots.getBoundingClientRect();
+    if (!box.width) return;
+    const rel = (r) => ({ left: r.left - box.left, top: r.top - box.top, right: r.right - box.left, bottom: r.bottom - box.top });
+    const taken = [...el.hud.querySelectorAll(".hud-left, .hud-right"), el.nav].filter((n) => n && !n.hidden).map((n) => rel(n.getBoundingClientRect()));
+    const hits = (a) => taken.some((b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
+    const gap = C.reveal.labelGapPx;
+    const spots = [...el.hotspots.querySelectorAll(".hotspot")].map((node) => ({ node, r: rel(node.getBoundingClientRect()) })).sort((a, b) => a.r.top - b.r.top);
+    spots.forEach(({ node, r }) => {
+      const label = document.createElement("div");
+      label.className = "reveal-label";
+      label.textContent = node.dataset.label;
+      el.hotspots.appendChild(label);
+      const w = label.offsetWidth, h = label.offsetHeight;
+      const cx = Math.min(Math.max((r.left + r.right) / 2 - w / 2, gap), box.width - w - gap);
+      const tops = [r.top - h - gap, r.bottom + gap, r.top + gap];
+      for (let k = 1; k <= C.reveal.labelTries; k++) tops.push(r.top - h - gap + k * (h + gap));
+      const fits = (top) => ({ left: cx, top, right: cx + w, bottom: top + h });
+      const ok = tops.map(fits).find((a) => a.top >= gap && a.bottom <= box.height - gap && !hits(a)) || fits(Math.max(gap, tops[0]));
+      Object.assign(label.style, { left: `${ok.left}px`, top: `${ok.top}px` });
+      taken.push(ok);
+    });
+  }
+
   function onKey(e) {
     if (e.key === " " || e.key === "Enter") {
       if (advance) {
@@ -137,7 +199,11 @@
           next.click();
         }
       }
+    } else if (viewer && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      e.preventDefault();
+      stepViewer(e.key === "ArrowLeft" ? -1 : 1);
     } else if (e.key === "Escape") {
+      if (viewer) return closeViewer();
       if (menuResolve) return resolveMenu(null);
       if (hypState) return closeHypothesis(null);
       if (notebookState) return closeNotebook(null);
@@ -203,6 +269,8 @@
     const people = backdrop ? "" : CH.chars.inScene(s, id).map((c) => CH.art.character(c.id, c.p.x, c.p.y, c.p.h, false)).join("");
     el.scene.innerHTML = composeSvg(d.back, d.anim, people + (d.front || "") + (d.top || ""));
     renderHotspots();
+    if (!backdrop && id !== lastSceneId) revealHotspots(C.reveal.enterMs, false);
+    lastSceneId = backdrop ? "" : id;
   }
 
   // Static background, animated layer, then people and foreground on top.
@@ -346,7 +414,7 @@
 
   function say(who, text) {
     return new Promise((resolve) => {
-      fillDialog(who, rich(text), `<div class="continue">${esc(t("ui.click_continue"))}</div>`);
+      fillDialog(who, rich(text), `<div class="continue">${esc(t(coarse() ? "ui.tap_continue" : "ui.click_continue"))}</div>`);
       el.catcher.hidden = false;
       advance = () => {
         advance = null;
@@ -417,6 +485,7 @@
     // Cards shown once are no longer new.
     s.clueOrder.forEach((id) => delete s.fresh[id]);
     if (notebookState.tab === "deds") s.dedOrder.forEach((id) => delete s.fresh["d:" + id]);
+    closeViewer();
     notebookState = null;
     el.notebook.hidden = true;
     hintCards = [];
@@ -493,6 +562,20 @@
         renderNotebook();
       })
     );
+    // Pictures inside a card open larger; a click on the rest of the card selects it.
+    el.notebook.querySelectorAll(".card .snap").forEach((n) => {
+      n.setAttribute("role", "button");
+      n.tabIndex = 0;
+      n.title = t("ui.zoom");
+      n.setAttribute("aria-label", n.title);
+      const open = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        openViewer(n);
+      };
+      n.addEventListener("click", open);
+      n.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " " ? open(e) : null));
+    });
     el.notebook.querySelectorAll(".card.clue").forEach((c) =>
       c.addEventListener("click", () => {
         if (CH.game.busy && !st.pick) return;
@@ -508,6 +591,44 @@
         renderNotebook();
       })
     );
+  }
+
+  // The viewer browses the pictures of the card it was opened from.
+  function openViewer(node) {
+    closeViewer();
+    const pics = [...node.closest(".card").querySelectorAll(".snap")];
+    const root = document.createElement("div");
+    root.className = "viewer";
+    root.addEventListener("click", closeViewer);
+    el.notebook.appendChild(root);
+    viewer = { root, pics, i: pics.indexOf(node) };
+    renderViewer();
+  }
+
+  function renderViewer() {
+    const { root, pics, i } = viewer;
+    const many = pics.length > 1;
+    const arrow = (dir, key) => `<button class="viewer-nav" data-dir="${dir}" title="${esc(t(key))}" aria-label="${esc(t(key))}"${(dir < 0 ? i === 0 : i === pics.length - 1) ? " disabled" : ""}>${dir < 0 ? "&lsaquo;" : "&rsaquo;"}</button>`;
+    root.innerHTML = `<div class="viewer-row">${many ? arrow(-1, "ui.viewer_prev") : ""}<div class="viewer-pic">${pics[i].innerHTML}</div>${many ? arrow(1, "ui.viewer_next") : ""}</div>
+      <p class="viewer-tip">${many ? `<span class="viewer-count">${esc(t("ui.viewer_count", { n: i + 1, total: pics.length }))}</span> ` : ""}${esc(t(coarse() ? "ui.viewer_close_tap" : many ? "ui.viewer_close_keys" : "ui.viewer_close"))}</p>`;
+    root.querySelectorAll(".viewer-nav").forEach((b) =>
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        stepViewer(Number(b.dataset.dir));
+      })
+    );
+  }
+
+  function stepViewer(dir) {
+    const i = viewer.i + dir;
+    if (i < 0 || i >= viewer.pics.length) return;
+    viewer.i = i;
+    renderViewer();
+  }
+
+  function closeViewer() {
+    if (viewer) viewer.root.remove();
+    viewer = null;
   }
 
   // Cluedo grid: one column per kind, auto-crossed cards show their source.
@@ -593,7 +714,7 @@
     el.board.hidden = true;
   }
 
-  function renderBoard(feedback) {
+  function renderBoard(feedback, flagged) {
     const id = boardState.id;
     const parts = t(`board.${id}.text`).split(/\{(q\d)\}/);
     const story = parts
@@ -601,7 +722,7 @@
         if (i % 2 === 0) return esc(p);
         const options = CH.i18n.list(`board.${id}.${p}`);
         const cur = boardState.answers[p];
-        return `<select data-q="${p}"><option value="">${esc(t("ui.board_blank"))}</option>${options.map((o, k) => `<option value="${k}"${cur === k ? " selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
+        return `<select data-q="${p}"${flagged === p ? ' class="wrong"' : ""}><option value="">${esc(t("ui.board_blank"))}</option>${options.map((o, k) => `<option value="${k}"${cur === k ? " selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
       })
       .join("");
     el.board.innerHTML = `
@@ -616,15 +737,26 @@
     el.board.querySelectorAll("select").forEach((sel) =>
       sel.addEventListener("change", () => {
         boardState.answers[sel.dataset.q] = sel.value === "" ? null : Number(sel.value);
+        sel.classList.remove("wrong");
       })
     );
     el.board.querySelector(".submit").addEventListener("click", async () => {
       if (CH.game.busy) return;
-      const res = await CH.game.submitBoard(id, boardState.answers);
-      if (res === "ok") return;
-      const key = { incomplete: "ui.board_incomplete", near: "ui.board_near", far: "ui.board_far" }[res];
-      if (!el.board.hidden) renderBoard(t(key));
+      const r = await CH.game.submitBoard(id, boardState.answers);
+      if (r.res === "ok" || el.board.hidden) return;
+      if (r.res === "incomplete") return renderBoard(t("ui.board_incomplete"));
+      // Repeated failures get more precise: first how many blanks are wrong, then which one.
+      let text = t(r.res === "near" ? "ui.board_near" : "ui.board_far");
+      if (r.tries >= C.board.countFromTry) text = boardCount(r.wrong.length);
+      const flagged = r.tries >= C.board.pinpointFromTry ? r.wrong[0] : null;
+      if (flagged) text += " " + t("ui.board_pinpoint");
+      renderBoard(text, flagged);
     });
+  }
+
+  function boardCount(n) {
+    const key = `ui.board_count.${n}`;
+    return CH.i18n.has(key) ? t(key) : t("ui.board_count.n", { n });
   }
 
   // ---------------------------------------------------------------- Screens

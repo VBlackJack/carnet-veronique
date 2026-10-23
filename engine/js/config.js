@@ -25,8 +25,12 @@ CH.config = Object.freeze(Object.assign({
   portrait: { viewBox: "-95 -450 190 190" },
   // Hint system: each level costs one biscuit, three levels per goal.
   hint: { maxLevel: 3, cost: 1, pulseMs: 6000 },
-  // Final board feedback thresholds (number of wrong blanks).
-  board: { nearMissMax: 2 },
+  // Board feedback: near-miss threshold (wrong blanks), then from which failed try the
+  // feedback counts the wrong blanks, and from which one it points at one of them.
+  board: { nearMissMax: 2, countFromTry: 2, pinpointFromTry: 3 },
+  // Hotspots briefly outlined when a scene opens, and for longer on demand (magnifier).
+  // Labels shown by the magnifier: spacing in pixels, and how many lower spots to try.
+  reveal: { enterMs: 1400, onDemandMs: 2000, labelGapPx: 4, labelTries: 6 },
   toastMs: 3200,
   toastMax: 3,
   helpMinClues: 2,

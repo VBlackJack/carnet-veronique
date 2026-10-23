@@ -33,4 +33,9 @@ CH.shelf = [
     released: true,
     cover: "glass",
   },
+  {
+    id: "le-monocle",
+    released: true,
+    cover: "monocle",
+  },
 ];

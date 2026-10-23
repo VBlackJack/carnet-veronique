@@ -27,5 +27,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "shelf.boule-a-facettes.title": `La Boule à facettes`,
   "shelf.boule-a-facettes.tagline": `Paris, 1978. Une star du disco, un collier de diamants, et soixante-dix secondes de noir.`,
   "shelf.verre-de-minuit.title": `Le Verre de minuit`,
+  "shelf.le-monocle.title": `Le Monocle`,
+  "shelf.le-monocle.tagline": `Londres, 1895. Un saphir étoilé, un brouillard jaune, et un monocle sur le velours.`,
   "shelf.verre-de-minuit.tagline": `Murano, 1911. Un maître verrier, un calice trop beau, et une horloge qui n'a pas sonné.`,
 });

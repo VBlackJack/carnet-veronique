@@ -75,6 +75,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "chr.coco.name": `Coco`,
   "chr.ray.name": `Ray`,
   "chr.henri.name": `Henri`,
+  "chr.henri.of": `d'Henri`,
   "chr.sylvie.name": `Sylvie`,
   "chr.julien.name": `Julien`,
   "chr.benjamin.name": `Benjamin`,
@@ -118,7 +119,9 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
 
   // ------------------------------------------------------------------ Places
   "scene.piste.name": `La piste`,
+  "scene.piste.in": `sur la piste`,
   "scene.scene.name": `La scène`,
+  "scene.scene.in": `sur la scène`,
   "scene.bar.name": `Le bar`,
   "scene.loge.name": `La loge`,
   "scene.cabine.name": `La cabine`,

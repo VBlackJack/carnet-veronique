@@ -20,7 +20,7 @@
   const { has, flag, item } = CH.S;
   const ded = (s, id) => !!s.deds[id];
   const hs = (scene, id, pro = false) => ({ kind: "hs", scene, id, pro });
-  const chr = (id) => ({ kind: "char", id });
+  const chr = (id, card = null) => ({ kind: "char", id, card });
   const cards = (a, b) => ({ kind: "ded", a, b });
 
   const GOALS = [
@@ -52,7 +52,7 @@
     { id: "dedHeure", act: 3, done: (s) => ded(s, "heure"), target: () => cards("photos", "carnet_veto") },
     { id: "village", act: 3, done: (s) => flag(s, "villageOpen"), target: (s) => (has(s, "echarpe") ? chr("capucine") : hs("enclos", "cloture")) },
     { id: "plaquette", act: 3, done: (s) => has(s, "plaquette") || has(s, "recette") || has(s, "gerard_aveu"), target: () => hs("enclos", "tresor", true) },
-    { id: "aveu", act: 3, done: (s) => has(s, "gerard_aveu"), target: () => chr("gerard") },
+    { id: "aveu", act: 3, done: (s) => has(s, "gerard_aveu"), target: (s) => chr("gerard", has(s, "plaquette") ? "plaquette" : "recette") },
     { id: "belote", act: 3, done: (s) => has(s, "belote"), target: () => chr("momo") },
     { id: "dedGerard", act: 3, done: (s) => ded(s, "gerard"), target: () => cards("gerard_aveu", "belote") },
     {

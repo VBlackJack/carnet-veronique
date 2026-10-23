@@ -67,6 +67,8 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "chr.veronique.name": `Véronique`,
   "chr.biscotte.name": `Biscotte`,
   "chr.morosini.name": `Le professeur Morosini`,
+  "chr.morosini.inline": `le professeur Morosini`,
+  "chr.morosini.of": `du professeur Morosini`,
   "chr.barbaro.name": `Lucia Barbaro`,
   "chr.ottavio.name": `Ottavio`,
   "chr.nane.name": `Nane`,
@@ -77,6 +79,8 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "chr.bernard.name": `Bernardo`,
   "chr.francoise.name": `Francesca`,
   "chr.bortolo.name": `Le maître Zanin`,
+  "chr.bortolo.inline": `le maître Zanin`,
+  "chr.bortolo.of": `du maître Zanin`,
 
   // ------------------------------------------------------------------ Grid cards
   "card.who.morosini": `Alvise Morosini, le conservateur`,
@@ -121,6 +125,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "scene.echantillons.name": `La salle des échantillons`,
   "scene.atelier.name": `L'atelier d'Elena`,
   "scene.fondamenta.name": `La fondamenta`,
+  "scene.fondamenta.in": `sur la fondamenta`,
   "scene.musee.name": `Le musée du verre`,
 
   // Furnace hall

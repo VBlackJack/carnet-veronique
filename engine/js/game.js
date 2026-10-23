@@ -309,9 +309,10 @@
   async function submitBoard(id, answers) {
     const def = ST().BOARDS[id];
     const keys = Object.keys(def.answers);
-    if (keys.some((k) => answers[k] === null || answers[k] === undefined)) return "incomplete";
+    if (keys.some((k) => answers[k] === null || answers[k] === undefined)) return { res: "incomplete" };
     s.tries[id] = (s.tries[id] || 0) + 1;
-    const wrong = keys.filter((k) => answers[k] !== def.answers[k]).length;
+    const wrongKeys = keys.filter((k) => answers[k] !== def.answers[k]);
+    const wrong = wrongKeys.length;
     save();
     if (wrong === 0) {
       CH.ui.closeBoard();
@@ -319,13 +320,13 @@
         setFlag(def.done);
         await run(ST().CUTS[def.cut]);
       });
-      return "ok";
+      return { res: "ok" };
     }
     if (def.suspect && answers[def.suspect] !== def.answers[def.suspect]) {
       const key = `board.${id}.wrong.${answers[def.suspect]}`;
       if (CH.i18n.has(key)) await action(() => run([{ l: key }]));
     }
-    return wrong <= C.board.nearMissMax ? "near" : "far";
+    return { res: wrong <= C.board.nearMissMax ? "near" : "far", wrong: wrongKeys, tries: s.tries[id] };
   }
 
   // Manual grid marks cycle: none -> crossed -> doubtful -> none.
@@ -342,16 +343,44 @@
     return CH.t(`scene.${id}.name`);
   }
 
+  // Initials that take the elided form of "of" in front of a name (French: d'Ada).
+  const ELIDING_INITIALS = /^[aeiouyàâäéèêëîïôöùûü]/i;
+
+  // A character's name as it reads mid-sentence, alone and after "of". Optional keys
+  // chr.<id>.inline and chr.<id>.of cover names that open on an article.
+  function nameParams(id) {
+    const name = CH.t(`chr.${id}.name`);
+    const inline = CH.i18n.has(`chr.${id}.inline`) ? CH.t(`chr.${id}.inline`) : name;
+    let ofName = inline;
+    if (CH.i18n.has(`chr.${id}.of`)) ofName = CH.t(`chr.${id}.of`);
+    else if (CH.i18n.has("hint.of")) ofName = CH.t(ELIDING_INITIALS.test(inline) && CH.i18n.has("hint.of.vowel") ? "hint.of.vowel" : "hint.of", { name: inline });
+    return { name, inline, ofName };
+  }
+
+  // A scene's name as it reads after a preposition. Optional key scene.<id>.in covers
+  // places that take another preposition than the hint.in template.
+  function placeParams(id) {
+    const place = sceneName(id);
+    const placeLc = place.charAt(0).toLowerCase() + place.slice(1);
+    let inPlace = placeLc;
+    if (CH.i18n.has(`scene.${id}.in`)) inPlace = CH.t(`scene.${id}.in`);
+    else if (CH.i18n.has("hint.in")) inPlace = CH.t("hint.in", { place: placeLc });
+    return { place, placeLc, inPlace };
+  }
+
   function hintText(target, level) {
     switch (target.kind) {
       case "hs": {
-        const p = { place: sceneName(target.scene), thing: CH.t(`hs.${target.scene}.${target.id}.label`) };
+        const p = Object.assign(placeParams(target.scene), { thing: CH.t(`hs.${target.scene}.${target.id}.label`) });
         if (level === 2) return CH.t("hint.find.2", p);
         return CH.t(target.pro ? "hint.pro.3" : "hint.find.3", p);
       }
       case "char": {
         const pres = CH.chars.get(target.id).presence(s);
-        return CH.t(`hint.char.${level}`, { name: CH.t(`chr.${target.id}.name`), place: pres ? sceneName(pres.scene) : "" });
+        const p = Object.assign(nameParams(target.id), pres ? placeParams(pres.scene) : { place: "", placeLc: "", inPlace: "" });
+        // A hint that asks to show a card names it, when the episode has the template.
+        if (target.card && CH.i18n.has(`hint.show.${level}`)) return CH.t(`hint.show.${level}`, Object.assign(p, { card: CH.t(`clue.${target.card}.title`) }));
+        return CH.t(`hint.char.${level}`, p);
       }
       case "ded": {
         if (!s.clues[target.a] || !s.clues[target.b]) return CH.t("hint.missing");

@@ -244,7 +244,7 @@
       { id: "bottes", x: 1290, y: 630, w: 140, h: 104, look: [L("hs.cuisine.bottes.look"), { egg: "bottesFleurs" }], pro: { steps: [L("hs.cuisine.bottes.pro"), { clue: "bottes" }] } },
       { id: "mocassins", x: 1436, y: 730, w: 140, h: 54, look: [L("hs.cuisine.mocassins.look"), { if: (s) => s.act === 1, then: [L("hs.cuisine.mocassins.family")] }, { clue: "mocassins" }] },
       { id: "poubelle", x: 596, y: 700, w: 82, h: 104, look: (s) => (s.act >= 2 && !has(s, "contrat_3") ? [L("hs.cuisine.poubelle.look"), { clue: "contrat_3" }] : [L("hs.cuisine.poubelle.empty")]) },
-      { id: "certificat", x: 796, y: 524, w: 84, h: 34, when: (s) => s.act >= 2, look: [L("hs.cuisine.certificat.look"), { clue: "certificat" }] },
+      { id: "certificat", x: 778, y: 506, w: 120, h: 70, when: (s) => s.act >= 2, look: [L("hs.cuisine.certificat.look"), { clue: "certificat" }] },
       { id: "tablier", x: 1520, y: 240, w: 76, h: 190, look: [L("hs.cuisine.tablier.look")] },
     ],
   });

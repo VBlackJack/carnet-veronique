@@ -90,12 +90,12 @@
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
 
   <script>window.CH = { episode: {} };</script>
-  <script src="engine/js/config.js?v=20261022.2051"></script>
-  <script src="engine/locales/fr-ui.js?v=20261022.2051"></script>
-  <script src="locales/fr-shelf.js?v=20261022.2051"></script>
-  <script src="engine/js/i18n.js?v=20261022.2051"></script>
-  <script src="engine/js/art/kit.js?v=20261022.2051"></script>
-  <script src="shelf.js?v=20261022.2051"></script>
+  <script src="engine/js/config.js?v=20261023.0944"></script>
+  <script src="engine/locales/fr-ui.js?v=20261023.0944"></script>
+  <script src="locales/fr-shelf.js?v=20261023.0944"></script>
+  <script src="engine/js/i18n.js?v=20261023.0944"></script>
+  <script src="engine/js/art/kit.js?v=20261023.0944"></script>
+  <script src="shelf.js?v=20261023.0944"></script>
   <script>
     // Covers drawn with the same kit as the games.
     (function () {
@@ -136,6 +136,23 @@
           s += `<ellipse cx="380" cy="214" rx="34" ry="8" fill="#9ad0c8" stroke="#3b2f2a" stroke-width="2.5"/><path d="M380 210V160" stroke="#9ad0c8" stroke-width="9"/><circle cx="380" cy="180" r="9" fill="#9ad0c8" stroke="#3b2f2a" stroke-width="2"/>`;
           s += `<path d="M336 96H424L408 150Q380 162 352 150Z" fill="#9ad0c8" fill-opacity=".85" stroke="#3b2f2a" stroke-width="3"/><rect x="346" y="106" width="68" height="12" fill="#2f6a9a" stroke="#3b2f2a" stroke-width="1.5"/><path d="M336 96H424" stroke="#d9b44a" stroke-width="4"/>`;
           s += `<circle cx="380" cy="130" r="90" fill="url(#g-warm)" opacity=".5"/>`;
+          return s;
+        },
+        monocle() {
+          A.srand(45);
+          let s = `<rect width="480" height="270" fill="#2a261e"/>`;
+          for (let x = -20; x < 500; x += 120) {
+            s += `<rect x="${x}" y="30" width="110" height="200" fill="#463a30" stroke="#3b2f2a" stroke-width="2.5"/>`;
+            for (let r = 0; r < 2; r++) s += `<rect x="${x + 22}" y="${55 + r * 80}" width="26" height="40" fill="${(x + r) % 3 ? "#ffd78a" : "#2a2420"}" stroke="#3b2f2a" stroke-width="2"/><rect x="${x + 62}" y="${55 + r * 80}" width="26" height="40" fill="${(x + r + 1) % 3 ? "#ffd78a" : "#2a2420"}" stroke="#3b2f2a" stroke-width="2"/>`;
+          }
+          s += `<rect x="0" y="230" width="480" height="40" fill="#3a342a"/>`;
+          s += `<rect x="-20" y="70" width="520" height="150" fill="#d8c98e" opacity=".45"/>`;
+          // The monocle on its cord, with the blue star sapphire reflected in it
+          s += `<path d="M300 132q40 60 -10 110" stroke="#1f1a18" stroke-width="3" fill="none"/>`;
+          s += `<circle cx="240" cy="130" r="62" fill="#ffffff" fill-opacity=".25" stroke="#c9a24a" stroke-width="9"/>`;
+          s += `<circle cx="240" cy="130" r="20" fill="#2a4aa0" stroke="#3b2f2a" stroke-width="2"/>`;
+          for (let a = 0; a < 6; a++) s += `<line x1="240" y1="130" x2="${(240 + Math.cos(a * Math.PI / 3) * 17).toFixed(1)}" y2="${(130 + Math.sin(a * Math.PI / 3) * 17).toFixed(1)}" stroke="#ffffff" stroke-width="2"/>`;
+          s += `<path d="M206 98q12 -16 32 -18" stroke="#ffffff" stroke-width="4" fill="none" opacity=".8"/>`;
           return s;
         },
       };

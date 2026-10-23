@@ -190,6 +190,8 @@
     // Cheeks
     s += sh(blob(-26, -343, 8, 5, 0.1, 8), c.blush || P.pink, { sw: 0, op: 0.45 });
     s += sh(blob(26, -343, 8, 5, 0.1, 8), c.blush || P.pink, { sw: 0, op: 0.45 });
+    if (c.squint) s += ink(line(-24, -366, -8, -366, 0.2), 2.4) + ink(line(8, -366, 24, -366, 0.2), 2.4);
+    if (c.noseMarks) s += `<ellipse cx="-6" cy="-358" rx="2.6" ry="3.6" fill="#d9605a" opacity=".85"/><ellipse cx="7" cy="-358" rx="2.6" ry="3.6" fill="#d9605a" opacity=".85"/>`;
     if (c.mole) s += `<circle cx="9" cy="-318" r="${c.mole === "big" ? 3 : 2}" fill="${P.inkSoft}"/>`;
     if (c.freckles) {
       [[-30, -350], [-24, -346], [-34, -344], [-20, -351], [-28, -340], [30, -350], [24, -346], [34, -344], [20, -351], [28, -340], [-4, -350], [5, -349]].forEach(([x, y]) => (s += `<circle cx="${x}" cy="${y}" r="1.4" fill="#a8603e" opacity=".75"/>`));
@@ -341,12 +343,12 @@
       // Hand raised to the face (phone or chin).
       s += sh(soft([[k * 50, -300], [k * 66, -290], [k * 74, -240], [k * 54, -232], [k * 46, -262]], 1.5), sleeve);
       s += sh(soft([[k * 74, -248], [k * 62, -340], [k * 46, -336], [k * 56, -238]], 1.5), sleeve);
-      s += sh(blob(k * 50, -350, 12, 14, 0.08, 9), c.skin);
+      s += sh(blob(k * 50, -350, 12, 14, 0.08, 9), c.gloves || c.skin);
       return s;
     }
     if (pose === "front") {
       s += sh(soft([[k * 50, -300], [k * 66, -290], [k * 56, -214], [k * 18, -206], [k * 18, -224], [k * 40, -230], [k * 44, -280]], 1.5), sleeve);
-      s += sh(blob(k * 14, -214, 12, 12, 0.08, 9), c.skin);
+      s += sh(blob(k * 14, -214, 12, 12, 0.08, 9), c.gloves || c.skin);
       return s;
     }
     if (c.rolled) {
@@ -356,7 +358,7 @@
     } else {
       s += sh(soft([[k * 52, -300], [k * 68, -288], [k * 74, -184], [k * 56, -180], [k * 46, -276]], 1.5), sleeve);
     }
-    s += sh(blob(k * 65, -172, 12, 13, 0.08, 9), c.skin);
+    s += sh(blob(k * 65, -172, 12, 13, 0.08, 9), c.gloves || c.skin);
     return s;
   }
 
@@ -480,8 +482,14 @@
     }
     if (c.coatOpen) {
       s += sh(soft([[-62, -306], [-16, -300], [-22, -92], [-70, -92]], 1.8), c.coatOpen) + sh(soft([[16, -300], [62, -306], [70, -92], [22, -92]], 1.8), c.coatOpen);
+      if (c.capeLining) s += sh(soft([[-16, -300], [-26, -300], [-32, -92], [-22, -92]], 0.8), c.capeLining, { sw: 1.6 }) + sh(soft([[16, -300], [26, -300], [32, -92], [22, -92]], 0.8), c.capeLining, { sw: 1.6 });
       s += sh(soft([[-16, -300], [-34, -288], [-24, -230]], 0.6), c.coatOpen, { sw: 1.8 }) + sh(soft([[16, -300], [34, -288], [24, -230]], 0.6), c.coatOpen, { sw: 1.8 });
     }
+    if (c.medals) c.medals.forEach((col, i) => {
+      const x = 26 + i * 12;
+      s += sh(rect(x - 5, -276, 10, 13, 0.3), col, { sw: 1.2 }) + `<circle cx="${x}" cy="-256" r="5.5" fill="#d9b44a" stroke="${P.ink}" stroke-width="1.2"/>`;
+    });
+    if (c.monocleCase) s += ink(curve([[-6, -222], [-14, -210], [-24, -212]], 0.3), 2, { stroke: "#d9b44a" }) + sh(rect(-34, -218, 14, 20, 0.3), c.monocleCase, { sw: 1.4 }) + `<circle cx="-27" cy="-212" r="4" fill="none" stroke="#d9b44a" stroke-width="1.4"/>`;
     if (c.smock) {
       s += sh(soft([[-60, -300], [60, -300], [72, -110], [-72, -110]], 2), c.smock);
       [[-30, -200, P.rust], [20, -160, P.teal], [36, -230, P.mustard], [-14, -140, P.plum]].forEach(([x, y, col]) => (s += `<circle cx="${x}" cy="${y}" r="5" fill="${col}" opacity=".75"/>`));
@@ -574,6 +582,7 @@
       [[bx - 6, by], [bx + 6, by + 4], [bx + 3, by - 14]].forEach(([x, y], i) => (bis += `<circle cx="${x}" cy="${y}" r="2.4" fill="${["#e65a7a", "#f6f1e6", "#6ab0e0"][i]}"/>`));
       s += g(bis, `transform="translate(${bx},${by}) scale(1.7) translate(${-bx},${-by})"`);
     }
+    if (c.programme) s += sh(rect(48, -222, 44, 58, 0.5), "#f3ece0", { sw: 2.4 }) + sh(rect(53, -217, 34, 48, 0.3), "none", { sw: 1.6, stroke: "#c9a24a" }) + sh(rect(58, -210, 24, 10, 0.2), c.programme, { sw: 0 }) + ink(line(58, -194, 82, -194, 0.2), 1.4, { op: 0.5 }) + ink(line(58, -186, 78, -186, 0.2), 1.4, { op: 0.5 });
     if (c.cigCase) s += sh(rect(58, -180, 18, 12, 0.6), "#c9c9c4", { sw: 1.6 });
     if (c.mug) s += sh(rect(56, -196, 26, 30, 1.5), c.mug) + ink(curve([[82, -190], [92, -182], [82, -172]], 0.5), 3);
     if (c.towel) s += sh(soft([[30, -306], [58, -306], [62, -240], [44, -236]], 1.5), "#f2efe6") + ink(line(36, -280, 58, -280, 0.5), 2, { stroke: P.red });
@@ -616,9 +625,19 @@
     if (c.walrus) s += sh(soft([[-30, -332], [-14, -344], [0, -340], [14, -344], [30, -332], [24, -318], [10, -328], [0, -326], [-10, -328], [-24, -318]], 1), c.walrus);
     if (c.screwdriver) s += ink(line(48, -380, 62, -346, 0.3), 4, { stroke: P.red }) + ink(line(56, -362, 64, -340, 0.3), 2, { stroke: "#9aa0a6" });
     if (c.mustache) s += sh(soft([[-20, -336], [0, -342], [20, -336], [12, -332], [0, -336], [-12, -332]], 0.8), c.mustache);
+    if (c.handlebar) {
+      s += sh(soft([[-4, -340], [-26, -340], [-40, -350], [-38, -358], [-30, -346], [-14, -336], [0, -336]], 0.6), c.handlebar);
+      s += sh(soft([[4, -340], [26, -340], [40, -350], [38, -358], [30, -346], [14, -336], [0, -336]], 0.6), c.handlebar);
+    }
     s += hairFront(c);
     if (c.headband) s += sh(soft([[-48, -392], [-20, -402], [20, -402], [48, -392], [48, -382], [20, -392], [-20, -392], [-48, -382]], 0.8), c.headband);
     s += glasses(c);
+    if (c.monocle) {
+      const m = c.monocle;
+      s += ink(curve([[-34, -358], [-44, -330], [-30, -300], [-12, -292]], 0.4), 1.6, { stroke: m.cord || "#1f1a18" });
+      s += `<circle cx="-20" cy="-362" r="15" fill="#ffffff" fill-opacity=".22" stroke="${m.color || "#c9a24a"}" stroke-width="3.2"/>` + ink(line(-27, -369, -21, -373, 0.2), 2, { stroke: "#ffffff", op: 0.85 });
+      if (m.veiled) s += `<circle cx="-16" cy="-362" r="4.6" fill="#c9cdd1" opacity=".75"/>`;
+    }
     if (c.brushes) [[-18, -440, -2, -404], [8, -446, 6, -406], [30, -436, 14, -404]].forEach(([x1, y1, x2, y2], i) => {
       s += ink(line(x1, y1, x2, y2, 0.2), 4, { stroke: P.woodLight }) + `<circle cx="${x1}" cy="${y1}" r="4" fill="${[P.teal, P.rust, P.mustard][i]}" stroke="${P.ink}" stroke-width="1.2"/>`;
     });
@@ -634,6 +653,18 @@
         s += sh(rect(-46, -428, 92, 12, 0.5), h.band || P.plum, { sw: 1.4 });
         if (h.feather) s += sh(soft([[30, -430], [60, -490], [84, -500], [70, -470], [44, -428]], 1), h.feather) + ink(curve([[34, -430], [62, -478], [80, -496]], 0.3), 1.4, { op: 0.6 });
         if (h.flowers) [[-30, -432], [-14, -436], [-38, -420]].forEach(([x, y], i) => (s += `<circle cx="${x}" cy="${y}" r="8" fill="${h.flowers[i % h.flowers.length]}" stroke="${P.ink}" stroke-width="1.4"/>`));
+      } else if (h.kind === "top") {
+        s += sh(soft([[-40, -404], [-36, -486], [36, -486], [40, -404]], 0.8), h.color);
+        s += sh(soft([[-62, -402], [-50, -394], [50, -394], [62, -402], [50, -410], [-50, -410]], 0.8), h.color);
+        s += sh(rect(-39, -428, 78, 14, 0.4), h.band || "#1f1a18", { sw: 1.4 }) + ink(line(-28, -474, -26, -436, 0.2), 2, { stroke: "#ffffff", op: 0.25 });
+      } else if (h.kind === "boater") {
+        s += sh(soft([[-74, -404], [-60, -396], [60, -396], [74, -404], [60, -412], [-60, -412]], 0.8), h.color);
+        s += sh(soft([[-42, -408], [-40, -436], [40, -436], [42, -408]], 0.6), h.color);
+        s += sh(rect(-41, -426, 82, 12, 0.3), h.band || "#2f3a5a", { sw: 1.4 });
+        for (let x = -36; x <= 36; x += 12) s += ink(line(x, -434, x + 3, -410, 0.2), 1, { op: 0.3 });
+      } else if (h.kind === "tiara") {
+        s += ink(curve([[-40, -404], [-20, -418], [0, -422], [20, -418], [40, -404]], 0.3), 3.4, { stroke: h.color || "#d9d9dc" });
+        [[-24, -420, 6], [0, -432, 9], [24, -420, 6]].forEach(([x, y, r]) => (s += sh(poly([[x, y - r], [x + r * 0.7, y + 2], [x, y + r * 0.6], [x - r * 0.7, y + 2]], 0.2), h.stone || "#9ad0e8", { sw: 1.4 })));
       } else if (h.kind === "beret") {
         s += sh(blob(10, -420, 58, 20, 0.06, 12), h.color) + sh(blob(10, -440, 5, 5, 0.1, 6), h.color);
         if (h.flower) {
@@ -725,6 +756,13 @@
     s += `<circle cx="29" cy="4" r="2.2" fill="${P.ink}"/>`;
     s += ink(curve([[22, 11], [28, 12]], 0.3), 1.8);
     if (c.beard) s += sh(soft([[16, 10], [22, 30], [12, 14]], 0.8), c.beardCol || c.coat);
+    if (c.deerstalker) {
+      const d = c.deerstalker;
+      s += sh(soft([[-16, -14], [-12, -30], [4, -36], [18, -28], [20, -14]], 0.6), d);
+      s += sh(soft([[18, -16], [32, -14], [30, -10], [18, -12]], 0.4), d) + sh(soft([[-16, -16], [-28, -12], [-26, -8], [-14, -12]], 0.4), d);
+      for (let x = -10; x <= 14; x += 6) s += ink(line(x, -32, x, -16, 0.2), 1, { stroke: "#5a4a34", op: 0.6 });
+      s += ink(line(-14, -26, 18, -26, 0.2), 1, { stroke: "#5a4a34", op: 0.6 });
+    }
     return s;
   }
 

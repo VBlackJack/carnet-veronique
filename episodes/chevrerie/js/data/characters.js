@@ -50,7 +50,7 @@
     thibault: {
       presence: (s) => {
         if (s.act === 1) return { scene: "cuisine", x: 1215, y: 860, h: 420 };
-        if (s.act === 2 || s.act === 3) return { scene: "cour", x: 860, y: 870, h: 410 };
+        if (s.act === 2 || s.act === 3) return { scene: "cour", x: 250, y: 870, h: 410 };
         return null;
       },
       topics: [
@@ -136,7 +136,7 @@
       presence: (s) => {
         if (s.act === 1) return { scene: "cuisine", x: 830, y: 790, h: 370 };
         if (s.act === 2) return { scene: "enclos", x: 1470, y: 885, h: 360 };
-        if (s.act === 3) return { scene: "chemin", x: 590, y: 890, h: 370 };
+        if (s.act === 3) return { scene: "chemin", x: 1400, y: 890, h: 370 };
         return null;
       },
       topics: [

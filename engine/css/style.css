@@ -111,6 +111,27 @@ html, body {
   transition: opacity 0.15s;
 }
 .hotspot:hover::after, .hotspot:focus-visible::after { opacity: 1; }
+/* Brief outline of every hotspot: on entering a scene, and with the magnifier. */
+#hotspots.reveal .hotspot {
+  background: rgba(255, 235, 190, 0.16);
+  box-shadow: inset 0 0 0 0.18cqw rgba(255, 240, 210, 0.85), 0 0 1.2cqw rgba(255, 217, 160, 0.55);
+  animation: shimmer 1.4s ease-in-out;
+}
+#hotspots.reveal .hotspot::after { opacity: 0; }
+.reveal-label {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--font-hand);
+  font-size: 1.7cqw;
+  line-height: 1;
+  padding: 0.25cqw 0.8cqw;
+  background: var(--paper);
+  border: 0.12cqw solid var(--ink);
+  border-radius: 0.5cqw;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  z-index: 1;
+}
 .hotspot.is-char::after { bottom: auto; top: -0.6cqw; transform: translate(-50%, -100%); }
 
 .pro-btn {
@@ -177,7 +198,8 @@ button {
 #btnBoard { font-family: var(--font-hand); font-size: 1.6cqw; line-height: 1; background: #f6d79b; animation: glow 2.2s ease-in-out infinite; }
 #btnMenu { font-size: 0.85em; opacity: 0.85; }
 #btnFull { display: inline-flex; align-items: center; padding: 0.35cqw 0.7cqw; }
-#btnFull svg { width: 1.6cqw; height: 1.6cqw; min-width: 16px; min-height: 16px; }
+#btnFull svg, #btnReveal svg { width: 1.6cqw; height: 1.6cqw; min-width: 16px; min-height: 16px; display: block; }
+#btnReveal { display: inline-flex; align-items: center; padding: 0.35cqw 0.7cqw; }
 .rotate-full { font-family: var(--font-text); font-size: 18px; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--paper); background: transparent; color: var(--paper); }
 #badge {
   position: absolute;
@@ -213,6 +235,11 @@ button {
 @media (pointer: coarse) {
   #nav { flex-wrap: wrap; width: 96cqw; gap: 0.7cqw; }
   .nav-btn { font-size: 2.3cqw; padding: 1cqw 1.4cqw; }
+  .nav-btn, .hud-btn, .opt, .panel button, .screen button { min-height: 44px; }
+  .nav-btn, .hud-btn { min-width: 44px; }
+  #btnFull, #btnReveal { justify-content: center; }
+  .link-btn { display: inline-flex; align-items: center; min-height: 44px; }
+  .hotspot { min-width: 44px; min-height: 44px; }
 }
 
 #biscotte {
@@ -271,7 +298,7 @@ button {
 .dialog.veronique .speaker { color: var(--teal); }
 .text { font-size: 1.18em; line-height: 1.45; flex: 1; }
 .dialog.narration .text, .dialog.biscotte .text { font-style: italic; color: #4b3d34; }
-.continue { align-self: flex-end; font-size: 0.8em; color: var(--ink); opacity: 0.9; animation: blinkSoft 1.6s ease-in-out infinite; }
+.continue { align-self: flex-end; font-size: max(16px, 0.8em); color: var(--ink); opacity: 0.9; animation: blinkSoft 1.6s ease-in-out infinite; }
 .muted { color: var(--ink-soft); font-size: 0.9em; }
 
 .options { display: flex; flex-wrap: wrap; gap: 0.5cqw; margin-top: 0.5cqw; }
@@ -448,6 +475,28 @@ button {
 
 .snaps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.3cqw; margin-top: 0.5cqw; }
 .snap svg { width: 100%; display: block; border: 0.1cqw solid var(--ink); }
+.card .snap { cursor: zoom-in; }
+.card .snap:hover svg, .card .snap:focus-visible svg { outline: 0.2cqw solid var(--ochre); }
+/* Picture viewer opened from a notebook card. */
+.viewer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1cqw;
+  background: rgba(26, 20, 17, 0.88);
+  cursor: zoom-out;
+  animation: rise 0.18s ease-out;
+}
+.viewer-row { display: flex; align-items: center; gap: 1.2cqw; }
+.viewer-pic { width: 64cqw; }
+.viewer .viewer-nav { font-size: 3.4cqw; line-height: 1; min-width: 44px; min-height: 44px; padding: 0.2cqw 1cqw; }
+.viewer .viewer-nav:disabled { opacity: 0.3; cursor: default; }
+.viewer-count { font-style: normal; font-weight: 700; margin-right: 0.6cqw; }
+.viewer-pic svg { width: 100%; display: block; border: 0.25cqw solid var(--paper); border-radius: 0.4cqw; box-shadow: var(--shadow); }
+.viewer-tip { margin: 0; color: var(--paper); font-style: italic; font-size: max(16px, 0.9em); }
 
 .story {
   flex: 1;
@@ -468,6 +517,7 @@ button {
   cursor: pointer;
 }
 .feedback { min-height: 1.6em; color: var(--rust); font-style: italic; margin: 0; }
+.story select.wrong { border-bottom: 0.3cqw solid var(--rust); color: var(--rust); background: #fbe3d6; }
 
 /* ------------------------------------------------------------ Screens */
 .screen {
@@ -575,6 +625,7 @@ button {
 @keyframes flame { from { transform: scale(1, 0.92) skewX(-3deg); } to { transform: scale(1.04, 1.08) skewX(3deg); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes sparkle { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes shimmer { 0%, 100% { opacity: 1; } 35% { opacity: 0.55; } 70% { opacity: 1; } }
 @keyframes blinkSoft { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
 @keyframes rise { from { opacity: 0; transform: translateY(0.8cqw); } to { opacity: 1; transform: none; } }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
@@ -582,7 +633,8 @@ button {
 @keyframes actcard { 0% { opacity: 0; transform: translate(-50%, -40%); } 18%, 75% { opacity: 1; transform: translate(-50%, -50%); } 100% { opacity: 0; transform: translate(-50%, -58%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim *, #biscotte *, .pulse, #btnBoard, #btnNotebook.nudge { animation: none !important; }
+  .anim *, #biscotte *, .pulse, #btnBoard, #btnNotebook.nudge, #hotspots.reveal .hotspot, .viewer { animation: none !important; }
+  .hotspot { transition: none; }
 }
 
 #rotate { display: none; }

@@ -84,6 +84,8 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "ui.click_continue": `Clic ou Espace pour continuer`,
   "ui.tap_continue": `Touche pour continuer`,
   "ui.reveal": `Montrer ce qu'on peut examiner`,
+  "ui.places": `Changer de lieu`,
+  "ui.places_btn": `{place} ▾`,
   "ui.zoom": `Agrandir`,
   "ui.viewer_close": `Clic ou Échap pour refermer`,
   "ui.viewer_close_tap": `Touche la photo pour refermer`,

@@ -371,7 +371,8 @@
   function hintText(target, level) {
     switch (target.kind) {
       case "hs": {
-        const p = Object.assign(placeParams(target.scene), { thing: CH.t(`hs.${target.scene}.${target.id}.label`) });
+        const thing = CH.t(`hs.${target.scene}.${target.id}.label`);
+        const p = Object.assign(placeParams(target.scene), { thing, thingLc: thing.charAt(0).toLowerCase() + thing.slice(1) });
         if (level === 2) return CH.t("hint.find.2", p);
         return CH.t(target.pro ? "hint.pro.3" : "hint.find.3", p);
       }

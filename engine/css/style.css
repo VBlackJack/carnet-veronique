@@ -230,6 +230,10 @@ button {
   white-space: nowrap;
 }
 .nav-btn { font-family: var(--font-hand); font-size: 1.45cqw; line-height: 1; padding: 0.35cqw 0.9cqw; }
+/* Only the buttons catch taps: the gaps between them leave the scene clickable. */
+#nav { pointer-events: none; }
+#nav .nav-btn { pointer-events: auto; }
+#btnPlaces { display: none; }
 .nav-btn.current { background: var(--ink); color: var(--paper); }
 /* Fingers need bigger targets: larger buttons, on two rows if needed. */
 @media (pointer: coarse) {
@@ -240,6 +244,33 @@ button {
   #btnFull, #btnReveal { justify-content: center; }
   .link-btn { display: inline-flex; align-items: center; min-height: 44px; }
   .hotspot { min-width: 44px; min-height: 44px; }
+}
+/* Phones: the place buttons live in a list opened from the HUD, the scene stays free. */
+@media (pointer: coarse) and (max-height: 600px) {
+  #btnPlaces { display: inline-flex; align-items: center; font-family: var(--font-hand); font-size: max(16px, 1.6cqw); white-space: nowrap; }
+  #btnPlaces[hidden] { display: none; }
+  #nav { display: none; }
+  #nav.open {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    top: calc(1cqw + 52px);
+    right: 1.2cqw;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: auto;
+    max-height: calc(100% - 64px);
+    overflow-y: auto;
+    gap: 6px;
+    padding: 8px;
+    border-radius: var(--radius);
+    background: rgba(36, 28, 24, 0.6);
+    pointer-events: auto;
+    z-index: 12;
+  }
+  #nav.open .nav-btn { font-size: max(16px, 1.6cqw); text-align: left; padding: 0 14px; }
+  #nav.open:has(.nav-btn:nth-child(9)) { grid-template-columns: repeat(3, auto); }
+  .hud-left { max-width: 40cqw; }
 }
 
 #biscotte {

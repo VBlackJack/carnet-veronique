@@ -59,6 +59,7 @@
     el.btnMenu.addEventListener("click", () => !CH.game.busy && showTitle());
     setupFullscreen();
     setupReveal();
+    setupPlaces();
     el.biscotte.addEventListener("click", () => !CH.game.busy && CH.game.biscotte());
     el.biscotte.addEventListener("keydown", (e) => {
       if ((e.key === "Enter" || e.key === " ") && !CH.game.busy) {
@@ -144,6 +145,22 @@
     btn.setAttribute("aria-label", btn.title);
     btn.addEventListener("click", () => !CH.game.busy && revealHotspots(C.reveal.onDemandMs, true));
     el.btnNotebook.parentNode.insertBefore(btn, el.btnNotebook);
+  }
+
+  // On a phone the row of place buttons would cover the bottom of the scene: a HUD button
+  // naming the current place opens the list instead (CSS decides which one shows).
+  function setupPlaces() {
+    const btn = document.createElement("button");
+    btn.id = "btnPlaces";
+    btn.className = "hud-btn";
+    btn.title = t("ui.places");
+    btn.setAttribute("aria-label", btn.title);
+    btn.addEventListener("click", () => !CH.game.busy && el.nav.classList.toggle("open"));
+    el.btnNotebook.parentNode.insertBefore(btn, el.btnNotebook.parentNode.firstChild);
+    el.btnPlaces = btn;
+    document.addEventListener("click", (e) => {
+      if (el.nav.classList.contains("open") && !el.nav.contains(e.target) && !btn.contains(e.target)) el.nav.classList.remove("open");
+    });
   }
 
   function revealHotspots(ms, labels) {
@@ -331,7 +348,10 @@
   function renderNav() {
     const s = S();
     el.nav.innerHTML = "";
-    if (backdrop || s.act >= C.acts.ending) return;
+    el.nav.classList.remove("open");
+    el.btnPlaces.hidden = !!backdrop || s.act >= C.acts.ending;
+    if (el.btnPlaces.hidden) return;
+    el.btnPlaces.textContent = t("ui.places_btn", { place: t(`scene.${s.scene}.name`) });
     CH.scenes.order.filter((id) => CH.scenes.get(id).unlock(s)).forEach((id) => {
       const b = document.createElement("button");
       b.className = "nav-btn" + (id === s.scene ? " current" : "");
@@ -932,7 +952,10 @@
     const mark = (node) => node && node.classList.add("pulse");
     if (target.kind === "hs" || target.kind === "char") {
       const scene = target.kind === "hs" ? target.scene : (CH.chars.get(target.id).presence(s) || {}).scene;
-      if (scene !== s.scene) return mark(el.nav.querySelector(`[data-scene="${scene}"]`));
+      if (scene !== s.scene) {
+        mark(el.btnPlaces);
+        return mark(el.nav.querySelector(`[data-scene="${scene}"]`));
+      }
       const node = el.hotspots.querySelector(`[data-id="${target.kind === "hs" ? target.id : "char:" + target.id}"]`);
       mark(node);
       if (target.pro && node) mark(node.querySelector(".pro-btn"));

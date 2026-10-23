@@ -160,12 +160,12 @@
       { id: "porte", x: 600, y: 390, w: 290, h: 260, look: [L("hs.enclos.porte.look"), { clue: "crochet" }] },
       { id: "sol", x: 560, y: 680, w: 440, h: 160, look: [L("hs.enclos.sol.look")], pro: { steps: [L("hs.enclos.sol.pro"), { clue: "traces_gaston" }] } },
       {
-        id: "cloture", x: 270, y: 380, w: 120, h: 140,
+        id: "cloture", x: 270, y: 352, w: 120, h: 88,
         look: (s) => (has(s, "echarpe") ? [L("hs.enclos.cloture.touch"), { egg: "statique" }] : [L("hs.enclos.cloture.look"), { clue: "echarpe" }, { flag: "scarfTaken" }]),
       },
       { id: "camera", x: 950, y: 300, w: 90, h: 80, look: [L("hs.enclos.camera.look")], pro: { steps: [L("hs.enclos.camera.pro")] } },
       {
-        id: "gerbera", x: 180, y: 430, w: 170, h: 120,
+        id: "gerbera", x: 180, y: 440, w: 170, h: 110,
         look: (s) => {
           if (flag(s, "stash")) return [L("hs.enclos.gerbera.after")];
           if (item(s, "cuillere")) return [L("hs.enclos.gerbera.distract"), { use: "cuillere" }, { flag: "stash" }];

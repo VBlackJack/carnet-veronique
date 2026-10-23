@@ -38,4 +38,5 @@ CH.shelf = [
     released: true,
     cover: "monocle",
   },
+  // Birthday gift for 2026-12-05: kept in the workshop, never published before then.
 ];

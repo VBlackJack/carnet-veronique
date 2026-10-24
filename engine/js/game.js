@@ -30,7 +30,7 @@
     return {
       v: SAVE_VERSION, act: C.acts.opening, scene: ST().FIRST_SCENE,
       flags: {}, clues: {}, clueOrder: [], deds: {}, dedOrder: [], items: {}, eggs: {}, marks: {}, crossed: {},
-      fresh: {}, seen: {}, hintLevels: {}, hintTargets: {}, biscuits: 0, tries: {}, hyps: 0, playMs: 0, genericIdx: 0,
+      fresh: {}, seen: {}, hintLevels: {}, hintTargets: {}, doneScenes: {}, biscuits: 0, tries: {}, hyps: 0, playMs: 0, genericIdx: 0,
     };
   }
 
@@ -300,6 +300,24 @@
     return run([{ l: `hyp.${witness}.${r.card.replace(".", "_")}` }, { clue: r.clue }]);
   }
 
+  // A place is done when every hotspot there has been looked at (and looked at closely when
+  // it allows it), and every character there has nothing left to say. Checked live, so a
+  // place that gains something new later shows as not done again.
+  function spotDone(sceneId, h) {
+    return !!s.seen[`hs:${sceneId}:${h.id}`] && (!h.pro || !!proBlocked() || !!s.seen[`pro:${sceneId}:${h.id}`]);
+  }
+
+  function charDone(id) {
+    const ch = CH.chars.get(id);
+    const topicsDone = ch.topics.filter((t) => !t.when || t.when(s)).every((t) => s.seen[`t:${id}:${t.id}`]);
+    return topicsDone && (!ch.pro || !!proBlocked() || !!s.seen[`pro:char:${id}`]);
+  }
+
+  function sceneDone(id) {
+    const spots = CH.scenes.get(id).hotspots.filter((h) => !h.when || h.when(s));
+    return spots.every((h) => spotDone(id, h)) && CH.chars.inScene(s, id).every((c) => charDone(c.id));
+  }
+
   function boardReady(id) {
     const def = ST().BOARDS[id];
     return !!def && !s.flags[def.done] && def.ready(s);
@@ -487,6 +505,9 @@
     combine,
     biscotte,
     boardReady,
+    sceneDone,
+    spotDone,
+    charDone,
     submitBoard,
     setMark,
   };

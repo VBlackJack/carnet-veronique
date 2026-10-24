@@ -191,7 +191,8 @@
     spots.forEach(({ node, r }) => {
       const label = document.createElement("div");
       label.className = "reveal-label";
-      label.textContent = node.dataset.label;
+      label.textContent = node.classList.contains("seen") ? t("ui.spot_seen", { label: node.dataset.label }) : node.dataset.label;
+      if (node.classList.contains("seen")) label.classList.add("seen");
       el.hotspots.appendChild(label);
       const w = label.offsetWidth, h = label.offsetHeight;
       const cx = Math.min(Math.max((r.left + r.right) / 2 - w / 2, gap), box.width - w - gap);
@@ -309,7 +310,8 @@
     });
     list.forEach((item) => {
       const node = document.createElement("div");
-      node.className = "hotspot" + (item.kind === "char" ? " is-char" : "");
+      const seen = item.kind === "char" ? CH.game.charDone(item.id) : CH.game.spotDone(s.scene, item.h);
+      node.className = "hotspot" + (item.kind === "char" ? " is-char" : "") + (seen ? " seen" : "");
       node.dataset.id = item.kind === "char" ? "char:" + item.id : item.id;
       node.dataset.label = item.label;
       Object.assign(node.style, { left: pct(item.x, W), top: pct(item.y, H), width: pct(item.w, W), height: pct(item.h_, H) });
@@ -351,20 +353,36 @@
     el.nav.classList.remove("open");
     el.btnPlaces.hidden = !!backdrop || s.act >= C.acts.ending;
     if (el.btnPlaces.hidden) return;
-    el.btnPlaces.textContent = t("ui.places_btn", { place: t(`scene.${s.scene}.name`) });
+    el.btnPlaces.textContent = t(CH.game.sceneDone(s.scene) ? "ui.places_btn_done" : "ui.places_btn", { place: t(`scene.${s.scene}.name`) });
+    let anyNew = false;
     CH.scenes.order.filter((id) => CH.scenes.get(id).unlock(s)).forEach((id) => {
       const b = document.createElement("button");
-      b.className = "nav-btn" + (id === s.scene ? " current" : "");
+      const done = CH.game.sceneDone(id);
+      // A place once done that the story has since given something new: flagged until visited.
+      if (done) s.doneScenes[id] = true;
+      else if (id === s.scene) delete s.doneScenes[id];
+      const fresh = !done && !!s.doneScenes[id];
+      anyNew = anyNew || fresh;
+      b.className = "nav-btn" + (id === s.scene ? " current" : "") + (done ? " done" : "") + (fresh ? " fresh-place" : "");
       b.dataset.scene = id;
       b.textContent = t(`scene.${id}.name`);
+      if (done) {
+        b.title = t("ui.place_done");
+        b.setAttribute("aria-label", t("ui.place_done_label", { place: b.textContent }));
+      } else if (fresh) {
+        b.title = t("ui.place_new");
+        b.setAttribute("aria-label", t("ui.place_new_label", { place: b.textContent }));
+      }
       b.addEventListener("click", () => {
         if (CH.game.busy || id === s.scene) return;
         s.scene = id;
         CH.game.save();
         refresh();
+        if (done) toast(t("ui.place_done"), "muted");
       });
       el.nav.appendChild(b);
     });
+    el.btnPlaces.classList.toggle("fresh-place", anyNew);
   }
 
   function objectiveKey(s) {

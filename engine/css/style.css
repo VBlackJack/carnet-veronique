@@ -118,6 +118,9 @@ html, body {
   animation: shimmer 1.4s ease-in-out;
 }
 #hotspots.reveal .hotspot::after { opacity: 0; }
+/* Already seen: a fainter outline under the magnifier, and a tick on the label. */
+#hotspots.reveal .hotspot.seen { background: transparent; box-shadow: inset 0 0 0 0.12cqw rgba(255, 240, 210, 0.45); }
+.reveal-label.seen { opacity: 0.7; }
 .reveal-label {
   position: absolute;
   white-space: nowrap;
@@ -233,6 +236,13 @@ button {
 /* Only the buttons catch taps: the gaps between them leave the scene clickable. */
 #nav { pointer-events: none; }
 #nav .nav-btn { pointer-events: auto; }
+/* A place with nothing left to do: a tick, and a quieter look. */
+.nav-btn.done::after { content: " \2713"; color: var(--olive); }
+.nav-btn.done:not(.current) { opacity: 0.75; }
+.nav-btn.current.done::after { color: var(--paper); }
+/* Something new in a place that was done: a dot, like a fresh card in the notebook. */
+.nav-btn, #btnPlaces { position: relative; }
+.nav-btn.fresh-place::before, #btnPlaces.fresh-place::before { content: ""; position: absolute; top: -0.4cqw; right: -0.4cqw; width: max(10px, 0.9cqw); height: max(10px, 0.9cqw); border-radius: 50%; background: var(--rust); border: 2px solid var(--paper); }
 #btnPlaces { display: none; }
 .nav-btn.current { background: var(--ink); color: var(--paper); }
 /* Fingers need bigger targets: larger buttons, on two rows if needed. */

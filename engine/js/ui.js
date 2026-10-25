@@ -24,6 +24,7 @@
 
   const GLASSES_ICON = `<svg viewBox="0 0 40 20" aria-hidden="true"><path d="M3 6h13v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zM24 6h13v8a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3zM16 9h8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg>`;
 
+  const OPEN_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const LOUPE_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M14.5 14.5L20 20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>`;
 
   const el = {};
@@ -41,6 +42,7 @@
   let lastSceneId = "";
   let revealTimer = null;
   let viewer = null;
+  let reader = null;
   const coarse = () => !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 
   const $ = (sel) => document.querySelector(sel);
@@ -220,8 +222,12 @@
     } else if (viewer && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
       e.preventDefault();
       stepViewer(e.key === "ArrowLeft" ? -1 : 1);
+    } else if (reader && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      e.preventDefault();
+      stepReader(e.key === "ArrowLeft" ? -1 : 1);
     } else if (e.key === "Escape") {
       if (viewer) return closeViewer();
+      if (reader) return closeReader();
       if (menuResolve) return resolveMenu(null);
       if (hypState) return closeHypothesis(null);
       if (notebookState) return closeNotebook(null);
@@ -524,6 +530,7 @@
     s.clueOrder.forEach((id) => delete s.fresh[id]);
     if (notebookState.tab === "deds") s.dedOrder.forEach((id) => delete s.fresh["d:" + id]);
     closeViewer();
+    closeReader();
     notebookState = null;
     el.notebook.hidden = true;
     hintCards = [];
@@ -541,7 +548,8 @@
     const invalid = hypo && def.invalidatedBy && s.deds[def.invalidatedBy];
     const tag = hypo ? `<span class="hypo-tag">${esc(t(invalid ? "ui.hypo_invalid" : "ui.hypo"))}</span>` : "";
     const cls = ["card", kind, hypo ? "hypo" : "", invalid ? "invalid" : "", extra ? "wide" : "", s.fresh[key] ? "fresh" : "", notebookState.selected === id ? "selected" : "", hintCards.includes(id) ? "pulse" : ""].join(" ");
-    return `<button class="${cls}" data-id="${esc(id)}" data-kind="${kind}">${tag}<h3>${esc(title)}</h3><p>${rich(text)}</p>${extra || ""}</button>`;
+    const open = `<span class="card-open" role="button" tabindex="0" title="${esc(t("ui.card_open"))}" aria-label="${esc(t("ui.card_open_label", { title }))}">${OPEN_ICON}</span>`;
+    return `<button class="${cls}" data-id="${esc(id)}" data-kind="${kind}">${tag}<h3>${esc(title)}</h3><p>${rich(text)}</p>${extra || ""}${open}</button>`;
   }
 
   function renderNotebook() {
@@ -600,6 +608,17 @@
         renderNotebook();
       })
     );
+    // The corner button opens a card full size, to read it whole.
+    el.notebook.querySelectorAll(".card .card-open").forEach((n) => {
+      const open = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        openReader(n.closest(".card"));
+      };
+      n.addEventListener("click", open);
+      n.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " " ? open(e) : null));
+    });
+    if (reader) renderReader();
     // Pictures inside a card open larger; a click on the rest of the card selects it.
     el.notebook.querySelectorAll(".card .snap").forEach((n) => {
       n.setAttribute("role", "button");
@@ -634,7 +653,7 @@
   // The viewer browses the pictures of the card it was opened from.
   function openViewer(node) {
     closeViewer();
-    const pics = [...node.closest(".card").querySelectorAll(".snap")];
+    const pics = [...node.closest(".card, .reader-card").querySelectorAll(".snap")];
     const root = document.createElement("div");
     root.className = "viewer";
     root.addEventListener("click", closeViewer);
@@ -662,6 +681,70 @@
     if (i < 0 || i >= viewer.pics.length) return;
     viewer.i = i;
     renderViewer();
+  }
+
+  // Card reader: one notebook card at full size, browsable, with the card's own action.
+  function openReader(card) {
+    closeReader();
+    const cards = [...el.notebook.querySelectorAll(".cards .card")].map((c) => ({ kind: c.dataset.kind, id: c.dataset.id }));
+    const root = document.createElement("div");
+    root.className = "reader";
+    root.addEventListener("click", (e) => e.target === root && closeReader());
+    el.notebook.appendChild(root);
+    reader = { root, cards, i: cards.findIndex((c) => c.id === card.dataset.id && c.kind === card.dataset.kind) };
+    renderReader();
+  }
+
+  function readerAction(entry) {
+    const st = notebookState;
+    if (!st || entry.kind !== "clue") return null;
+    if (st.pick) return t("ui.reader_show");
+    if (st.tab !== "clues") return null;
+    if (!st.selected) return t("ui.reader_select");
+    if (st.selected === entry.id) return t("ui.reader_unselect");
+    return t("ui.reader_combine", { title: t(`clue.${st.selected}.title`) });
+  }
+
+  function renderReader() {
+    const { root, cards, i } = reader;
+    const entry = cards[i];
+    const card = entry && el.notebook.querySelector(`.cards .card[data-kind="${entry.kind}"][data-id="${entry.id}"]`);
+    if (!card) return closeReader();
+    const copy = card.cloneNode(true);
+    copy.querySelectorAll(".card-open").forEach((n) => n.remove());
+    const many = cards.length > 1;
+    const arrow = (dir, key) => `<button class="viewer-nav" data-dir="${dir}" title="${esc(t(key))}" aria-label="${esc(t(key))}"${(dir < 0 ? i === 0 : i === cards.length - 1) ? " disabled" : ""}>${dir < 0 ? "&lsaquo;" : "&rsaquo;"}</button>`;
+    const action = readerAction(entry);
+    root.innerHTML = `<div class="viewer-row">${many ? arrow(-1, "ui.reader_prev") : ""}<div class="reader-card ${entry.kind}">${copy.innerHTML}</div>${many ? arrow(1, "ui.reader_next") : ""}</div>
+      <div class="reader-foot">${many ? `<span class="viewer-count">${esc(t("ui.viewer_count", { n: i + 1, total: cards.length }))}</span>` : ""}${action ? `<button class="reader-act">${esc(action)}</button>` : ""}<button class="reader-close">${esc(t("ui.close"))}</button></div>`;
+    root.querySelectorAll(".viewer-nav").forEach((b) => b.addEventListener("click", () => stepReader(Number(b.dataset.dir))));
+    root.querySelector(".reader-close").addEventListener("click", closeReader);
+    const act = root.querySelector(".reader-act");
+    if (act) act.addEventListener("click", () => {
+      closeReader();
+      card.click();
+    });
+    root.querySelectorAll(".reader-card .snap").forEach((n) => {
+      n.setAttribute("role", "button");
+      n.tabIndex = 0;
+      n.title = t("ui.zoom");
+      n.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openViewer(n);
+      });
+    });
+  }
+
+  function stepReader(dir) {
+    const i = reader.i + dir;
+    if (i < 0 || i >= reader.cards.length) return;
+    reader.i = i;
+    renderReader();
+  }
+
+  function closeReader() {
+    if (reader) reader.root.remove();
+    reader = null;
   }
 
   function closeViewer() {

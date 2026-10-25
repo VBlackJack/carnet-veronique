@@ -532,11 +532,31 @@ button {
   animation: rise 0.18s ease-out;
 }
 .viewer-row { display: flex; align-items: center; gap: 1.2cqw; }
+/* Corner button that opens a notebook card full size. */
+.card-open { position: absolute; right: 0.4cqw; bottom: 0.4cqw; width: 2.2cqw; height: 2.2cqw; min-width: 22px; min-height: 22px; padding: 0.3cqw; border-radius: 0.4cqw; color: var(--ink-soft); cursor: zoom-in; }
+.card-open svg { width: 100%; height: 100%; display: block; }
+.card-open:hover, .card-open:focus-visible { background: #f6d79b; color: var(--ink); }
+.card { padding-bottom: 2.6cqw; }
+.reader { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: 1cqw; background: rgba(26, 20, 17, 0.82); animation: rise 0.18s ease-out; }
+.reader-card { width: 62cqw; max-height: 34cqw; overflow-y: auto; background: #fffaf0; border: 0.2cqw solid var(--ink); border-radius: 0.8cqw; padding: 1.6cqw 2cqw; box-shadow: var(--shadow); font-size: max(17px, 1.5cqw); line-height: 1.5; text-align: left; }
+.reader-card.ded { background: #eef3ee; border-color: #2f4a46; }
+.reader-card.item { background: #f8efe0; }
+.reader-card h3 { font-family: var(--font-hand); font-size: max(26px, 2.8cqw); margin: 0 0 0.6cqw; line-height: 1.05; }
+.reader-card p { margin: 0 0 0.8cqw; }
+.reader-foot { display: flex; align-items: center; gap: 1cqw; color: var(--paper); }
+.reader-act { background: #f6d79b !important; font-family: var(--font-hand); font-size: max(18px, 1.7cqw) !important; }
+@media (pointer: coarse) {
+  .card-open { min-width: 44px; min-height: 44px; right: 0; bottom: 0; padding: 13px; }
+  .card { padding-bottom: 46px; }
+  .reader-card { max-height: 60vh; }
+  .reader-foot button { min-height: 44px; }
+}
 .viewer-pic { width: 64cqw; }
 .viewer .viewer-nav { font-size: 3.4cqw; line-height: 1; min-width: 44px; min-height: 44px; padding: 0.2cqw 1cqw; }
 .viewer .viewer-nav:disabled { opacity: 0.3; cursor: default; }
 .viewer-count { font-style: normal; font-weight: 700; margin-right: 0.6cqw; }
 .viewer-pic svg { width: 100%; display: block; border: 0.25cqw solid var(--paper); border-radius: 0.4cqw; box-shadow: var(--shadow); }
+.reader .viewer-count { color: var(--paper); }
 .viewer-tip { margin: 0; color: var(--paper); font-style: italic; font-size: max(16px, 0.9em); }
 
 .story {

@@ -30,6 +30,8 @@ CH.config = Object.freeze(Object.assign({
   board: { nearMissMax: 2, countFromTry: 2, pinpointFromTry: 3 },
   // Hotspots briefly outlined when a scene opens, and for longer on demand (magnifier).
   // Labels shown by the magnifier: spacing in pixels, and how many lower spots to try.
+  // After a rotation, some mobile browsers report the new size late: measure again then.
+  viewport: { settleMs: 400 },
   reveal: { enterMs: 1400, onDemandMs: 2000, labelGapPx: 4, labelTries: 6 },
   toastMs: 3200,
   toastMax: 3,

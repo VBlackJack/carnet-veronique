@@ -52,6 +52,7 @@
   function init() {
     ["stage", "scene", "hotspots", "hud", "act", "objective", "btnNotebook", "btnBoard", "btnMenu", "btnFull", "badge", "nav", "biscotte", "dialog", "catcher", "toasts", "notebook", "board", "screen", "actcard", "paper"].forEach((id) => (el[id] = document.getElementById(id)));
     document.getElementById("defs").innerHTML = `<defs>${CH.art.defs()}</defs>`;
+    setupViewport();
     paintTextures();
     el.btnNotebook.addEventListener("click", () => !CH.game.busy && openNotebook({ pick: false }));
     el.btnBoard.addEventListener("click", () => {
@@ -233,6 +234,34 @@
       if (notebookState) return closeNotebook(null);
       if (boardState) return closeBoard();
     }
+  }
+
+  // The stage is sized from the area really visible. On phones the browser toolbars come
+  // and go, and the CSS viewport units can lag behind: the scene then overflows the screen
+  // until something forces a new layout. Measuring it here keeps the stage inside the screen.
+  function fitViewport() {
+    const vv = window.visualViewport;
+    // A pinch-zoomed page keeps its layout: only the unzoomed visible area counts.
+    if (vv && vv.scale > 1.01) return;
+    const w = Math.round(vv ? vv.width : window.innerWidth);
+    const h = Math.round(vv ? vv.height : window.innerHeight);
+    const root = document.documentElement.style;
+    root.setProperty("--app-w", `${w}px`);
+    root.setProperty("--app-h", `${h}px`);
+  }
+
+  function setupViewport() {
+    const refit = () => {
+      fitViewport();
+      setTimeout(fitViewport, C.viewport.settleMs);
+    };
+    fitViewport();
+    window.addEventListener("resize", refit);
+    window.addEventListener("orientationchange", refit);
+    window.addEventListener("pageshow", refit);
+    document.addEventListener("visibilitychange", () => !document.hidden && refit());
+    ["fullscreenchange", "webkitfullscreenchange"].forEach((ev) => document.addEventListener(ev, refit));
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", refit);
   }
 
   // Paper grain and watercolour wash, generated once on canvases.

@@ -43,10 +43,14 @@ html, body {
   overflow: hidden;
 }
 
+/* --app-w and --app-h hold the visible area measured by the page (ui.js), which mobile
+   browsers update more reliably than 100dvh when their toolbars come and go. */
 #app {
   width: 100vw;
+  width: var(--app-w, 100vw);
   height: 100vh;
   height: 100dvh;
+  height: var(--app-h, 100dvh);
   display: grid;
   place-items: center;
 }
@@ -55,6 +59,7 @@ html, body {
   position: relative;
   width: min(100vw, 177.78vh);
   width: min(100vw, 177.78dvh);
+  width: min(var(--app-w, 100vw), calc(var(--app-h, 100dvh) * 16 / 9));
   aspect-ratio: 16 / 9;
   container-type: inline-size;
   overflow: hidden;

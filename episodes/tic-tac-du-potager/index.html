@@ -1,0 +1,81 @@
+<!doctype html>
+<!--
+  Copyright 2026 Julien Bombled
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#241c18">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="icon" href="../../engine/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../engine/icon.svg">
+  <title>Le Tic-tac du potager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../engine/css/style.css?v=20261026.2300">
+  <link rel="stylesheet" href="../../engine/css/mime.css?v=20261026.2300">
+</head>
+<body>
+  <svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+  <div id="app">
+    <div id="stage" class="mime">
+      <div id="m-back" class="m-layer"></div>
+      <div id="m-hero"></div>
+      <div id="m-front" class="m-layer"></div>
+      <div id="m-grain" class="m-layer"></div>
+      <div id="m-spots" class="m-layer"></div>
+      <div id="m-bee" hidden></div>
+      <div id="m-bubble" class="m-bubble" hidden></div>
+      <div id="m-catcher" hidden></div>
+      <div id="m-hud" hidden>
+        <button id="m-btn-book" class="m-hud-btn"><span id="m-badge" hidden></span></button>
+        <button id="m-btn-sound" class="m-hud-btn"></button>
+        <button id="m-btn-full" class="m-hud-btn"></button>
+        <button id="m-btn-home" class="m-hud-btn"></button>
+      </div>
+      <div id="m-book" hidden></div>
+      <div id="m-reveal" hidden></div>
+      <div id="m-veil"></div>
+      <div id="m-screen" hidden></div>
+    </div>
+    <div id="rotate" role="img"></div>
+  </div>
+
+  <script>window.CH = { episode: { saveKey: "tic-tac-du-potager.save.v1", shelfUrl: "../../lab.html", mime: { blurPx: 0 } } };</script>
+  <script src="../../engine/js/config.js?v=20261026.2300"></script>
+  <script src="../../engine/js/mime/config.js?v=20261026.2300"></script>
+  <script src="../../engine/locales/fr-mime.js?v=20261026.2300"></script>
+  <script src="locales/fr.js?v=20261026.2300"></script>
+  <script src="../../engine/js/i18n.js?v=20261026.2300"></script>
+  <script src="../../engine/js/art/kit.js?v=20261026.2300"></script>
+  <script src="js/art/props.js?v=20261026.2300"></script>
+  <script src="js/art/pics.js?v=20261026.2300"></script>
+  <script src="js/scenes/lavoir.js?v=20261026.2300"></script>
+  <script src="js/scenes/potager.js?v=20261026.2300"></script>
+  <script src="js/data/story.js?v=20261026.2300"></script>
+  <script src="../../engine/js/mime/sound.js?v=20261026.2300"></script>
+  <script src="js/data/sounds.js?v=20261026.2300"></script>
+  <script src="../../engine/js/mime/stage.js?v=20261026.2300"></script>
+  <script src="../../engine/js/mime/bubble.js?v=20261026.2300"></script>
+  <script src="../../engine/js/mime/sketchbook.js?v=20261026.2300"></script>
+  <script src="../../engine/js/mime/mime.js?v=20261026.2300"></script>
+  <script>CH.mime.game.init();</script>
+</body>
+</html>

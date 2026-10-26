@@ -40,4 +40,6 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "shelf.verre-de-minuit.tagline": `Murano, 1911. Un maître verrier, un calice trop beau, et une horloge qui n'a pas sonné.`,
   "shelf.lunettes-envolees.title": `Les Lunettes envolées`,
   "shelf.lunettes-envolees.tagline": `Un matin à la ferme, sans un mot. Le monde est flou, Biscotte mène l'enquête.`,
+  "shelf.tic-tac-du-potager.title": `Le Tic-tac du potager`,
+  "shelf.tic-tac-du-potager.tagline": `Fin octobre, sans un mot. Une montre rose a disparu entre le lavoir et les citrouilles.`,
 });

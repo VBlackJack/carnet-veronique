@@ -45,5 +45,11 @@ CH.shelf = [
     stage: "lab",
     cover: "spectacles",
   },
+  // Second wordless episode, same engine: a watch lost between the wash-house and the garden.
+  {
+    id: "tic-tac-du-potager",
+    stage: "lab",
+    cover: "pumpkin",
+  },
   // Birthday gift for 2026-12-05: kept in the workshop, never published before then.
 ];

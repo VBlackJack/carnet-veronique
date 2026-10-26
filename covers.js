@@ -87,5 +87,19 @@
     return s;
   };
 
+  COVERS.pumpkin = function () {
+    A.srand(62);
+    let s = `<rect width="480" height="270" fill="#d98a5a"/><rect width="480" height="140" fill="#6d5a7a" opacity=".55"/>`;
+    s += `<circle cx="380" cy="150" r="40" fill="#ffb85a" stroke="${P.ink}" stroke-width="2.4"/>`;
+    s += A.sh(A.soft([[-20, 186], [160, 174], [320, 184], [500, 172], [500, 290], [-20, 290]], 4), "#6a6a52", { sw: 2 });
+    s += `<circle cx="120" cy="196" r="70" fill="url(#g-warm)"/>`;
+    s += A.sh(A.blob(120, 196, 50, 38, 0.05, 12), "#e07a2a", { sw: 2.4 });
+    s += `<path d="M100 186l8 -16l8 16zM124 186l8 -16l8 16zM96 206l10 8l8 -6l8 6l8 -6l10 -2q-22 18 -44 0z" fill="#ffd25a" stroke="${P.ink}" stroke-width="2"/>`;
+    s += `<rect x="114" y="150" width="10" height="14" fill="#5f6b45" stroke="${P.ink}" stroke-width="2"/>`;
+    s += `<g transform="rotate(-14 186 76)"><rect x="178" y="24" width="16" height="104" rx="6" fill="#d9a5a0" stroke="${P.ink}" stroke-width="2.4"/><circle cx="186" cy="76" r="28" fill="#fbf6ea" stroke="#b07a70" stroke-width="7"/><path d="M186 76V56M186 76l12 6" stroke="${P.ink}" stroke-width="3.4" stroke-linecap="round"/></g>`;
+    s += A.namedGoat("biscotte", 330, 252, 1.05, true, { knitCoat: "#b0302a" });
+    return s;
+  };
+
   CH.covers = COVERS;
 })();

@@ -25,7 +25,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
     ["julien", `Des plaques de lanterne magique. "Voyage à Ceylan", 1895. Soixante plaques. Enfin, cinquante-huit : il manque le logement 52.`],
     ["n", `Au fond de la boîte, enroulé dans son cordon de soie noire : un monocle.`],
     ["benjamin", `Un monocle ? Comme les méchants dans les films ?`],
-    ["n", `Véronique le lève vers la lampe, cherche son foyer, par réflexe d'opticienne. Tobiasse, sur la table, ouvre un oeil, puis le referme.`],
+    ["n", `Véronique le lève vers la lampe, cherche son foyer, par réflexe d'opticienne. Tobias, sur la table, ouvre un oeil, puis le referme.`],
     ["n", `La lumière se brouille. Elle devient jaune, épaisse, et elle sent le charbon.`],
   ],
   "cut.opening.london": [
@@ -114,7 +114,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
     ["n", `À minuit, l'inspecteur de Scotland Yard arrive à pied, s'essuie les pieds, et trouve l'affaire réglée.`],
   ],
   "cut.finale.retour": [
-    ["n", `Le brouillard s'éclaircit. La cuisine, en 2026. Tobiasse n'a pas bougé.`],
+    ["n", `Le brouillard s'éclaircit. La cuisine, en 2026. Tobias n'a pas bougé.`],
     ["benjamin", `C'était qui, le méchant au monocle ?`],
     ["v.smile", `Il n'y avait pas de méchant au monocle. Juste un garçon qui ne voyait rien, et qui voulait garder la bague de sa mère.`],
     ["julien", `Cette boîte pèse trois livres et quatre onces. Je l'ai pesée en rentrant.`],
@@ -248,7 +248,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "dlg.julien.show_default": [["julien", `Je peux le noter, si tu veux.`]],
 
   // ------------------------------------------------------------------ Benjamin
-  "dlg.benjamin.soiree": [["benjamin", `J'ai vendu tous les programmes. Ensuite j'ai aidé papa à la lanterne. Le fondu enchaîné, c'est presque aussi bien qu'un film.`], ["benjamin", `Et Tobiasse a pas bougé de la lanterne de toute la soirée.`]],
+  "dlg.benjamin.soiree": [["benjamin", `J'ai vendu tous les programmes. Ensuite j'ai aidé papa à la lanterne. Le fondu enchaîné, c'est presque aussi bien qu'un film.`], ["benjamin", `Et Tobias a pas bougé de la lanterne de toute la soirée.`]],
   "dlg.benjamin.buffet": [["benjamin", `En vendant mes programmes, à 21h40, j'ai vu le monsieur de l'assurance au buffet. Il avait un verre. Il y était encore quand je suis revenu, vers 21h55.`]],
   "dlg.benjamin.show.c_rupert_soir": [["benjamin", `Parfaite ? Mais tout le monde a ri quand l'image est partie de travers !`]],
   "dlg.benjamin.show.c_penhallow_soir": [["benjamin", `Pas quitté des yeux ? Il était au buffet, je l'ai vu.`]],
@@ -324,7 +324,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "bis.eat": [["b", `Biscotte croque le biscuit, puis fixe Véronique avec un sérieux total, sous sa casquette.`]],
   "bis.pet.0": [["b", `Biscotte ferme les yeux. Sa casquette glisse de travers.`]],
   "bis.pet.1": [["b", `Biscotte éternue. Le brouillard le chatouille.`]],
-  "bis.pet.2": [["b", `Biscotte regarde Tobiasse, perché sur la lanterne. Tobiasse ne le regarde pas. C'est une longue histoire.`]],
+  "bis.pet.2": [["b", `Biscotte regarde Tobias, perché sur la lanterne. Tobias ne le regarde pas. C'est une longue histoire.`]],
   "bis.pet.3": [["b", `Biscotte fixe la cerise sur le nez de Bernard, de loin, par principe.`]],
   "hint.none": [["b", `Biscotte s'assoit. Il n'a rien à ajouter : tout est sur la table.`]],
   "hint.maxed": [["b", `Biscotte fixe l'endroit, puis Véronique, puis l'endroit. Il ne peut pas être plus clair.`]],

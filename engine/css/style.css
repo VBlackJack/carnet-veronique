@@ -68,6 +68,20 @@ html, body {
   font-size: clamp(13px, 1.35cqw, 26px);
 }
 
+/* Zoomable layer holding the scene, its paper and its hotspots (ui.js). The page handles
+   pinch and drag itself here, so the browser must not zoom or scroll the page instead.
+   --zoom is the current scale: labels and buttons inside divide their sizes by it to keep
+   their normal size on screen while the picture grows. */
+#world {
+  --zoom: 1;
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  touch-action: none;
+}
+#stage.zoomed #world { cursor: grab; }
+#stage.zoomed #world:active { cursor: grabbing; }
+
 #scene, #scene svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 #paper {
@@ -101,15 +115,15 @@ html, body {
   position: absolute;
   left: 50%;
   bottom: 100%;
-  transform: translate(-50%, -0.3cqw);
+  transform: translate(-50%, calc(-0.3cqw / var(--zoom)));
   white-space: nowrap;
   font-family: var(--font-hand);
-  font-size: 1.7cqw;
+  font-size: calc(1.7cqw / var(--zoom));
   line-height: 1;
-  padding: 0.25cqw 0.8cqw;
+  padding: calc(0.25cqw / var(--zoom)) calc(0.8cqw / var(--zoom));
   background: var(--paper);
-  border: 0.12cqw solid var(--ink);
-  border-radius: 0.5cqw;
+  border: calc(0.12cqw / var(--zoom)) solid var(--ink);
+  border-radius: calc(0.5cqw / var(--zoom));
   box-shadow: var(--shadow);
   opacity: 0;
   pointer-events: none;
@@ -130,27 +144,27 @@ html, body {
   position: absolute;
   white-space: nowrap;
   font-family: var(--font-hand);
-  font-size: 1.7cqw;
+  font-size: calc(1.7cqw / var(--zoom));
   line-height: 1;
-  padding: 0.25cqw 0.8cqw;
+  padding: calc(0.25cqw / var(--zoom)) calc(0.8cqw / var(--zoom));
   background: var(--paper);
-  border: 0.12cqw solid var(--ink);
-  border-radius: 0.5cqw;
+  border: calc(0.12cqw / var(--zoom)) solid var(--ink);
+  border-radius: calc(0.5cqw / var(--zoom));
   box-shadow: var(--shadow);
   pointer-events: none;
   z-index: 1;
 }
-.hotspot.is-char::after { bottom: auto; top: -0.6cqw; transform: translate(-50%, -100%); }
+.hotspot.is-char::after { bottom: auto; top: calc(-0.6cqw / var(--zoom)); transform: translate(-50%, -100%); }
 
 .pro-btn {
   position: absolute;
-  top: -1cqw;
-  right: -1cqw;
-  width: 2.6cqw;
-  height: 2.6cqw;
-  padding: 0.35cqw;
+  top: calc(-1cqw / var(--zoom));
+  right: calc(-1cqw / var(--zoom));
+  width: calc(2.6cqw / var(--zoom));
+  height: calc(2.6cqw / var(--zoom));
+  padding: calc(0.35cqw / var(--zoom));
   border-radius: 50%;
-  border: 0.14cqw solid var(--ink);
+  border: calc(0.14cqw / var(--zoom)) solid var(--ink);
   background: var(--paper);
   color: #22403c;
   cursor: zoom-in;
@@ -206,8 +220,8 @@ button {
 #btnBoard { font-family: var(--font-hand); font-size: 1.6cqw; line-height: 1; background: #f6d79b; animation: glow 2.2s ease-in-out infinite; }
 #btnMenu { font-size: 0.85em; opacity: 0.85; }
 #btnFull { display: inline-flex; align-items: center; padding: 0.35cqw 0.7cqw; }
-#btnFull svg, #btnReveal svg { width: 1.6cqw; height: 1.6cqw; min-width: 16px; min-height: 16px; display: block; }
-#btnReveal { display: inline-flex; align-items: center; padding: 0.35cqw 0.7cqw; }
+#btnFull svg, #btnReveal svg, #btnZoom svg { width: 1.6cqw; height: 1.6cqw; min-width: 16px; min-height: 16px; display: block; }
+#btnReveal, #btnZoom { display: inline-flex; align-items: center; padding: 0.35cqw 0.7cqw; }
 .rotate-full { font-family: var(--font-text); font-size: 18px; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--paper); background: transparent; color: var(--paper); }
 #badge {
   position: absolute;
@@ -256,9 +270,9 @@ button {
   .nav-btn { font-size: 2.3cqw; padding: 1cqw 1.4cqw; }
   .nav-btn, .hud-btn, .opt, .panel button:not(.card), .screen button { min-height: 44px; }
   .nav-btn, .hud-btn { min-width: 44px; }
-  #btnFull, #btnReveal { justify-content: center; }
+  #btnFull, #btnReveal, #btnZoom { justify-content: center; }
   .link-btn { display: inline-flex; align-items: center; min-height: 44px; }
-  .hotspot { min-width: 44px; min-height: 44px; }
+  .hotspot { min-width: calc(44px / var(--zoom)); min-height: calc(44px / var(--zoom)); }
 }
 /* Phones: the place buttons live in a list opened from the HUD, the scene stays free. */
 @media (pointer: coarse) and (max-height: 600px) {

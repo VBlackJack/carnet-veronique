@@ -163,8 +163,8 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "hs.lanterne.boite.look2": [["n", `La boîte de plaques. Le logement 52 est vide de nouveau. Julien l'a noté.`]],
   "hs.lanterne.radiateur.label": `Le radiateur`,
   "hs.lanterne.radiateur.look": [["n", `Un radiateur de fonte, brûlant. Derrière, dans l'ombre, quelque chose de roux.`]],
-  "hs.lanterne.tobiasse.label": `Tobiasse`,
-  "hs.lanterne.tobiasse.look": [["n", `Tobiasse dort sur le couvercle tiède de la lanterne, la place la plus chaude de tout Londres.`], ["julien", `Il refuse de bouger quand je change de plaque. Je travaille autour.`]],
+  "hs.lanterne.tobiasse.label": `Tobias`,
+  "hs.lanterne.tobiasse.look": [["n", `Tobias dort sur le couvercle tiède de la lanterne, la place la plus chaude de tout Londres.`], ["julien", `Il refuse de bouger quand je change de plaque. Je travaille autour.`]],
   "hs.lanterne.toile.label": `L'envers de l'écran`,
   "hs.lanterne.toile.look": [["n", `L'envers de la toile : l'image y apparaît à l'envers, et de l'autre côté le public la voit à l'endroit. On entend la salle respirer.`]],
 

@@ -67,7 +67,7 @@
       back += sh(rect(1190, 590, 260, 26, 1), M.wood) + ink(line(1210, 616, 1206, 700, 0.3), 8, { stroke: M.woodDark }) + ink(line(1430, 616, 1434, 700, 0.3), 8, { stroke: M.woodDark });
       back += K.waterGlobe(1280, 480, { flipped: true });
       back += sh(rect(1196, 520, 22, 70, 0.6), "#2a4a2a", { sw: 2 }) + sh(rect(1200, 500, 14, 22, 0.4), "#2a4a2a", { sw: 1.6 }) + sh(rect(1199, 494, 16, 8, 0.3), "#8a6a4a", { sw: 1.2 });
-      // Annealing oven at the back right, Tobiasse asleep on its warm bricks
+      // Annealing oven at the back right, Tobias asleep on its warm bricks
       back += K.arca(1180, 330, 400);
       back += A.namedCat("tobiasse", 1300, 316, 1.1);
       // Where the master fell, at the corner of the marver: the mark in the dust and

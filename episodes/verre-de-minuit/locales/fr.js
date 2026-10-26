@@ -153,7 +153,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "hs.fornace.horloge.label": `L'horloge électrique`,
   "hs.fornace.horloge.look": [["n", `L'horloge électrique toute neuve, avec son petit timbre de laiton par-dessus. Elle marque l'heure exacte. Julien en est très fier.`]],
   "hs.fornace.arca.label": `Le four de recuisson`,
-  "hs.fornace.arca.look": [["n", `L'arca, le long four de recuisson où le verre refroidit lentement, toute une nuit. Sur ses briques tièdes, un gros chat roux et blanc dort en boule.`], ["v.smile", `Tobiasse. Personne ne sait d'où il vient, mais il était là avant tout le monde.`], ["b", `Biscotte et Tobiasse s'ignorent avec une grande dignité.`]],
+  "hs.fornace.arca.look": [["n", `L'arca, le long four de recuisson où le verre refroidit lentement, toute une nuit. Sur ses briques tièdes, un gros chat roux et blanc dort en boule.`], ["v.smile", `Tobias. Personne ne sait d'où il vient, mais il était là avant tout le monde.`], ["b", `Biscotte et Tobias s'ignorent avec une grande dignité.`]],
   "hs.fornace.bouteille.label": `La bouteille`,
   "hs.fornace.bouteille.look": [["n", `Une bouteille de vin, sur l'établi. Pleine, bouchée, la cire du bouchon intacte.`], ["v", `Personne n'y a touché ce soir.`]],
 

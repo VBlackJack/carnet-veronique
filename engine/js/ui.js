@@ -26,6 +26,8 @@
 
   const OPEN_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const LOUPE_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M14.5 14.5L20 20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>`;
+  const ZOOM_IN_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.2 15.2L21 21" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M6.5 10h7M10 6.5v7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  const ZOOM_OUT_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.2 15.2L21 21" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M6.5 10h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`;
 
   const el = {};
   let backdrop = null;
@@ -43,6 +45,8 @@
   let revealTimer = null;
   let viewer = null;
   let reader = null;
+  // Scene zoom: scale, and offset of the zoomed layer as a fraction of the stage size.
+  const zoom = { z: 1, fx: 0, fy: 0 };
   const coarse = () => !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 
   const $ = (sel) => document.querySelector(sel);
@@ -63,6 +67,7 @@
     setupFullscreen();
     setupReveal();
     setupPlaces();
+    setupZoom();
     el.biscotte.addEventListener("click", () => !CH.game.busy && CH.game.biscotte());
     el.biscotte.addEventListener("keydown", (e) => {
       if ((e.key === "Enter" || e.key === " ") && !CH.game.busy) {
@@ -182,30 +187,204 @@
   }
 
   // Every label is placed above its hotspot, else below, else inside, else lower and
-  // lower: the first spot that stays on stage and clear of the HUD and other labels.
+  // lower: the first spot that stays on screen and clear of the HUD and other labels.
+  // Placement works in screen pixels over the stage; a zoomed scene is converted back to
+  // its own unscaled coordinates at the end (labels keep their size, see style.css).
   function placeRevealLabels() {
-    const box = el.hotspots.getBoundingClientRect();
+    const box = el.stage.getBoundingClientRect();
+    const layer = el.hotspots.getBoundingClientRect();
     if (!box.width) return;
     const rel = (r) => ({ left: r.left - box.left, top: r.top - box.top, right: r.right - box.left, bottom: r.bottom - box.top });
     const taken = [...el.hud.querySelectorAll(".hud-left, .hud-right"), el.nav].filter((n) => n && !n.hidden).map((n) => rel(n.getBoundingClientRect()));
     const hits = (a) => taken.some((b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
     const gap = C.reveal.labelGapPx;
-    const spots = [...el.hotspots.querySelectorAll(".hotspot")].map((node) => ({ node, r: rel(node.getBoundingClientRect()) })).sort((a, b) => a.r.top - b.r.top);
+    const visible = (r) => r.right > 0 && r.left < box.width && r.bottom > 0 && r.top < box.height;
+    const spots = [...el.hotspots.querySelectorAll(".hotspot")].map((node) => ({ node, r: rel(node.getBoundingClientRect()) })).filter(({ r }) => visible(r)).sort((a, b) => a.r.top - b.r.top);
     spots.forEach(({ node, r }) => {
       const label = document.createElement("div");
       label.className = "reveal-label";
       label.textContent = node.classList.contains("seen") ? t("ui.spot_seen", { label: node.dataset.label }) : node.dataset.label;
       if (node.classList.contains("seen")) label.classList.add("seen");
       el.hotspots.appendChild(label);
-      const w = label.offsetWidth, h = label.offsetHeight;
+      const w = label.offsetWidth * zoom.z, h = label.offsetHeight * zoom.z;
       const cx = Math.min(Math.max((r.left + r.right) / 2 - w / 2, gap), box.width - w - gap);
       const tops = [r.top - h - gap, r.bottom + gap, r.top + gap];
       for (let k = 1; k <= C.reveal.labelTries; k++) tops.push(r.top - h - gap + k * (h + gap));
       const fits = (top) => ({ left: cx, top, right: cx + w, bottom: top + h });
       const ok = tops.map(fits).find((a) => a.top >= gap && a.bottom <= box.height - gap && !hits(a)) || fits(Math.max(gap, tops[0]));
-      Object.assign(label.style, { left: `${ok.left}px`, top: `${ok.top}px` });
+      const x = (ok.left + box.left - layer.left) / zoom.z, y = (ok.top + box.top - layer.top) / zoom.z;
+      Object.assign(label.style, { left: `${x}px`, top: `${y}px` });
       taken.push(ok);
     });
+  }
+
+  // ---------------------------------------------------------------- Scene zoom
+  // Hotspots can sit close together, and on a phone they get hard to see and to tap.
+  // The scene, its paper and its hotspots live in one layer that can be enlarged inside
+  // the stage: pinch, double tap, wheel or the HUD button; drag to move around. The HUD,
+  // dialogues and panels stay at their normal size. Hotspots are transformed with the
+  // picture, so a tap always lands on what is drawn under the finger.
+  function setupZoom() {
+    const world = document.createElement("div");
+    world.id = "world";
+    el.stage.insertBefore(world, el.scene);
+    [el.scene, el.paper, el.hotspots].forEach((n) => world.appendChild(n));
+    el.world = world;
+    const btn = document.createElement("button");
+    btn.id = "btnZoom";
+    btn.className = "hud-btn";
+    btn.addEventListener("click", () => {
+      if (CH.game.busy) return;
+      if (zoom.z > 1) resetZoom();
+      else zoomCentered(C.zoom.step);
+    });
+    const reveal = document.getElementById("btnReveal");
+    reveal.parentNode.insertBefore(btn, reveal);
+    el.btnZoom = btn;
+    setupZoomGestures(world);
+    applyZoom();
+  }
+
+  function applyZoom() {
+    const w = el.world;
+    w.style.transform = zoom.z > 1 ? `translate(${(zoom.fx * 100).toFixed(3)}%, ${(zoom.fy * 100).toFixed(3)}%) scale(${zoom.z.toFixed(4)})` : "";
+    w.style.setProperty("--zoom", zoom.z.toFixed(4));
+    el.stage.classList.toggle("zoomed", zoom.z > 1);
+    const on = zoom.z > 1;
+    el.btnZoom.innerHTML = on ? ZOOM_OUT_ICON : ZOOM_IN_ICON;
+    el.btnZoom.title = t(on ? "ui.zoom_out" : "ui.zoom_in");
+    el.btnZoom.setAttribute("aria-label", el.btnZoom.title);
+    el.btnZoom.setAttribute("aria-pressed", String(on));
+  }
+
+  // New scale, keeping the stage point (sx, sy), in pixels, over the same spot of the
+  // picture, and never showing anything beyond the picture's edges.
+  function zoomAt(z, sx, sy) {
+    const box = el.stage.getBoundingClientRect();
+    if (!box.width) return;
+    const was = zoom.z > 1;
+    const nz = Math.min(Math.max(z, 1), C.zoom.max);
+    const px = (sx - zoom.fx * box.width) / zoom.z, py = (sy - zoom.fy * box.height) / zoom.z;
+    setZoom(nz, (sx - px * nz) / box.width, (sy - py * nz) / box.height);
+    if (!was && zoom.z > 1) zoomHint();
+  }
+
+  function setZoom(z, fx, fy) {
+    zoom.z = z;
+    zoom.fx = Math.min(0, Math.max(1 - z, fx));
+    zoom.fy = Math.min(0, Math.max(1 - z, fy));
+    applyZoom();
+  }
+
+  function zoomCentered(z) {
+    const box = el.stage.getBoundingClientRect();
+    zoomAt(z, box.width / 2, box.height / 2);
+  }
+
+  function resetZoom() {
+    if (zoom.z === 1 && !zoom.fx && !zoom.fy) return;
+    setZoom(1, 0, 0);
+  }
+
+  // The first time a game zooms in, say how to move around.
+  function zoomHint() {
+    const s = S();
+    if (!s || s.seen["help:zoom"]) return;
+    s.seen["help:zoom"] = true;
+    toast(t(coarse() ? "ui.zoom_hint_touch" : "ui.zoom_hint_mouse"));
+  }
+
+  function setupZoomGestures(world) {
+    const points = new Map();
+    let gesture = null;
+    let moved = false;
+    let lastTap = null;
+    const local = (e) => {
+      const box = el.stage.getBoundingClientRect();
+      return { x: e.clientX - box.left, y: e.clientY - box.top };
+    };
+    const pair = () => {
+      const [a, b] = [...points.values()];
+      return { mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, dist: Math.hypot(a.x - b.x, a.y - b.y) || 1 };
+    };
+    // A gesture starts from the current pointers: one finger drags, two pinch.
+    const begin = () => {
+      const box = el.stage.getBoundingClientRect();
+      const start = { z: zoom.z, tx: zoom.fx * box.width, ty: zoom.fy * box.height, box };
+      if (points.size >= 2) {
+        const p = pair();
+        gesture = Object.assign(start, { kind: "pinch", mid: p.mid, dist: p.dist });
+      } else if (points.size === 1) {
+        gesture = Object.assign(start, { kind: "drag", from: [...points.values()][0] });
+      } else gesture = null;
+    };
+    world.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (!points.size) moved = false;
+      points.set(e.pointerId, local(e));
+      begin();
+    });
+    world.addEventListener("pointermove", (e) => {
+      if (!points.has(e.pointerId) || !gesture) return;
+      points.set(e.pointerId, local(e));
+      const g = gesture, box = g.box;
+      if (g.kind === "pinch" && points.size >= 2) {
+        const p = pair();
+        const nz = Math.min(Math.max(g.z * (p.dist / g.dist), 1), C.zoom.max);
+        // The picture point first under the fingers' midpoint follows that midpoint.
+        const px = (g.mid.x - g.tx) / g.z, py = (g.mid.y - g.ty) / g.z;
+        const was = zoom.z > 1;
+        setZoom(nz, (p.mid.x - px * nz) / box.width, (p.mid.y - py * nz) / box.height);
+        if (!was && zoom.z > 1) zoomHint();
+        moved = true;
+      } else if (g.kind === "drag" && zoom.z > 1) {
+        const p = points.get(e.pointerId);
+        const dx = p.x - g.from.x, dy = p.y - g.from.y;
+        if (!moved && Math.hypot(dx, dy) < C.zoom.dragPx) return;
+        if (!moved) world.setPointerCapture(e.pointerId);
+        moved = true;
+        setZoom(zoom.z, (g.tx + dx) / box.width, (g.ty + dy) / box.height);
+      }
+    });
+    const end = (e) => {
+      if (!points.has(e.pointerId)) return;
+      const p = points.get(e.pointerId);
+      points.delete(e.pointerId);
+      if (points.size) return begin();
+      gesture = null;
+      if (zoom.z > 1 && zoom.z < C.zoom.snapBelow) resetZoom();
+      if (moved || e.type === "pointercancel") {
+        lastTap = null;
+        return;
+      }
+      // Double tap outside any hotspot: zoom in there, or back to the normal view.
+      if (e.target.closest(".hotspot") || CH.game.busy) {
+        lastTap = null;
+        return;
+      }
+      const now = performance.now();
+      if (lastTap && now - lastTap.at < C.zoom.doubleTapMs && Math.hypot(p.x - lastTap.x, p.y - lastTap.y) < C.zoom.doubleTapPx) {
+        lastTap = null;
+        if (zoom.z > 1) resetZoom();
+        else zoomAt(C.zoom.step, p.x, p.y);
+      } else lastTap = { at: now, x: p.x, y: p.y };
+    };
+    world.addEventListener("pointerup", end);
+    world.addEventListener("pointercancel", end);
+    // A drag or a pinch that ends over a hotspot must not open it.
+    world.addEventListener("click", (e) => {
+      if (!moved) return;
+      moved = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+    world.addEventListener("wheel", (e) => {
+      if (CH.game.busy || !el.screen.hidden) return;
+      e.preventDefault();
+      const p = local(e);
+      zoomAt(zoom.z * (e.deltaY < 0 ? C.zoom.wheelFactor : 1 / C.zoom.wheelFactor), p.x, p.y);
+      if (zoom.z < C.zoom.snapBelow) resetZoom();
+    }, { passive: false });
   }
 
   function onKey(e) {
@@ -226,6 +405,15 @@
     } else if (reader && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
       e.preventDefault();
       stepReader(e.key === "ArrowLeft" ? -1 : 1);
+    } else if (["+", "=", "-", "0"].includes(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      // Zoom keys only act on the scene itself, with no dialogue, panel or screen open.
+      if (backdrop || CH.game.busy || advance || menuResolve || viewer || reader || notebookState || boardState || hypState || !el.screen.hidden) return;
+      e.preventDefault();
+      if (e.key === "0") resetZoom();
+      else {
+        zoomCentered(zoom.z * (e.key === "-" ? 1 / C.zoom.keyFactor : C.zoom.keyFactor));
+        if (zoom.z < C.zoom.snapBelow) resetZoom();
+      }
     } else if (e.key === "Escape") {
       if (viewer) return closeViewer();
       if (reader) return closeReader();
@@ -317,6 +505,8 @@
     if (!force && key === lastSceneKey) return;
     lastSceneKey = key;
     const id = backdrop || s.scene;
+    // A new place, or a cinematic backdrop, opens at the normal view.
+    if (backdrop || id !== lastSceneId) resetZoom();
     const sc = CH.scenes.get(id);
     const d = sc.draw(s);
     const people = backdrop ? "" : CH.chars.inScene(s, id).map((c) => CH.art.character(c.id, c.p.x, c.p.y, c.p.h, false)).join("");
@@ -343,6 +533,9 @@
       const w = c.p.h * 0.34;
       list.push({ kind: "char", id: c.id, label: t(`chr.${c.id}.name`), x: c.p.x - w / 2, y: c.p.y - c.p.h, w, h_: c.p.h * 0.62, pro: !!CH.chars.get(c.id).pro });
     });
+    // Where areas overlap, the smaller one is the more precise target (an object lying in a
+    // wider area): larger areas go first, so the smaller ones sit on top of them.
+    list.sort((a, b) => b.w * b.h_ - a.w * a.h_);
     list.forEach((item) => {
       const node = document.createElement("div");
       const seen = item.kind === "char" ? CH.game.charDone(item.id) : CH.game.spotDone(s.scene, item.h);
@@ -362,7 +555,9 @@
       node.addEventListener("click", activate);
       node.addEventListener("keydown", (e) => (e.key === "Enter" ? activate() : null));
       if (item.pro) {
-        const used = item.kind === "char" ? s.seen[`pro:char:${item.id}`] : s.seen[`pro:${s.scene}:${item.id}`];
+        const used = item.kind === "char"
+          ? !!s.seen[`pro:char:${item.id}`] && CH.game.charProDone(item.id)
+          : !!s.seen[`pro:${s.scene}:${item.id}`] && CH.game.spotProDone(s.scene, item.h);
         const btn = document.createElement("button");
         btn.className = "pro-btn" + (used ? " used" : "");
         btn.innerHTML = GLASSES_ICON;
@@ -925,6 +1120,7 @@
     el.actcard.classList.remove("show");
     backdrop = "title";
     lastSceneKey = "";
+    resetZoom();
     const sc = CH.scenes.get("title").draw();
     el.scene.innerHTML = composeSvg(sc.back, sc.anim, sc.top);
     el.hotspots.innerHTML = "";

@@ -300,17 +300,40 @@
     return run([{ l: `hyp.${witness}.${r.card.replace(".", "_")}` }, { clue: r.clue }]);
   }
 
+  // True when running these steps now would give a clue, deduction or item not owned yet:
+  // a look that changes with the act is not done just because it was seen once.
+  function stepsGain(steps) {
+    if (!steps) return false;
+    const list = typeof steps === "function" ? steps(s) : steps;
+    return list.some((st) => {
+      if (Array.isArray(st)) return stepsGain(st);
+      if (st.clue && !s.clues[st.clue]) return true;
+      if (st.ded && !s.deds[st.ded]) return true;
+      if (st.item && !s.items[st.item]) return true;
+      return !!st.if && stepsGain(st.if(s) ? st.then : st.else);
+    });
+  }
+
   // A place is done when every hotspot there has been looked at (and looked at closely when
   // it allows it), and every character there has nothing left to say. Checked live, so a
   // place that gains something new later shows as not done again.
+  function spotProDone(sceneId, h) {
+    return !h.pro || !!proBlocked() || (!!s.seen[`pro:${sceneId}:${h.id}`] && !stepsGain(h.pro.steps));
+  }
+
   function spotDone(sceneId, h) {
-    return !!s.seen[`hs:${sceneId}:${h.id}`] && (!h.pro || !!proBlocked() || !!s.seen[`pro:${sceneId}:${h.id}`]);
+    return !!s.seen[`hs:${sceneId}:${h.id}`] && !stepsGain(h.look) && spotProDone(sceneId, h);
+  }
+
+  function charProDone(id) {
+    const ch = CH.chars.get(id);
+    return !ch.pro || !!proBlocked() || (!!s.seen[`pro:char:${id}`] && !stepsGain(ch.pro));
   }
 
   function charDone(id) {
     const ch = CH.chars.get(id);
     const topicsDone = ch.topics.filter((t) => !t.when || t.when(s)).every((t) => s.seen[`t:${id}:${t.id}`]);
-    return topicsDone && (!ch.pro || !!proBlocked() || !!s.seen[`pro:char:${id}`]);
+    return topicsDone && charProDone(id);
   }
 
   function sceneDone(id) {
@@ -507,7 +530,9 @@
     boardReady,
     sceneDone,
     spotDone,
+    spotProDone,
     charDone,
+    charProDone,
     submitBoard,
     setMark,
   };

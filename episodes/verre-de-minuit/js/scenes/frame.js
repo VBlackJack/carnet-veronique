@@ -37,7 +37,7 @@
       back += K.goblet(1000, 640, "#9ad0c8", 1.5, "chalice");
       // Light through the glass, spread into a fan of colours from its foot
       ["#e65a4a", "#f2a03a", "#f2d36b", "#5aae5a", "#4aa0d8", "#9a6ad0"].forEach((c, i) => (back += `<polygon points="1006,640 1014,640 ${1150 + i * 52},860 ${1100 + i * 52},860" fill="${c}" opacity=".42"/>`));
-      // Tobiasse asleep on the table, Biscotte watching
+      // Tobias asleep on the table, Biscotte watching
       back += A.namedCat("tobiasse", 1320, 610, 1.4, true);
       back += A.namedGoat("biscotte", 1500, 700, 0.75, true);
       const anim = `<polygon points="740,70 860,70 1300,900 300,900" fill="url(#g-beam)" opacity=".5"/><circle cx="800" cy="420" r="520" fill="url(#g-warm)" opacity=".45" class="flicker"/>`;

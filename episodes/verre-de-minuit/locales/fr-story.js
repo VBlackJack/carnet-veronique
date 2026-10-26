@@ -21,12 +21,12 @@ CH.locales = CH.locales || {};
 CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   // ------------------------------------------------------------------ Cutscenes
   "cut.opening.kitchen": [
-    ["n", `Un soir ordinaire, dans la cuisine. Tobiasse dort sur la table, roulé en boule, exactement là où il ne faut pas.`],
+    ["n", `Un soir ordinaire, dans la cuisine. Tobias dort sur la table, roulé en boule, exactement là où il ne faut pas.`],
     ["n", `Véronique ouvre une vieille boîte à lunettes qu'une cliente fidèle de la place lui a laissée au magasin : "Vous, vous saurez quoi en faire."`],
     ["n", `Dedans, dans du papier de soie : un petit verre de Murano, et un étui gravé "Zanin, 1911".`],
     ["benjamin", `C'est quoi ?`],
     ["v.smile", `Du cristallo. Regarde.`],
-    ["n", `Elle tourne le petit verre vers la lampe. La lumière se défait en couleurs sur la table, jusque sous le nez de Tobiasse, qui ne se réveille pas.`],
+    ["n", `Elle tourne le petit verre vers la lampe. La lumière se défait en couleurs sur la table, jusque sous le nez de Tobias, qui ne se réveille pas.`],
     ["julien", `C'est de la réfraction.`],
     ["v.amused", `Merci, Julien.`],
     ["n", `Les couleurs bougent. Une odeur de feu de bois. Une brume qui monte de la table.`],
@@ -131,15 +131,15 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
     ["n", `L'aube. Le brouillard se lève sur la lagune, qui devient rose. Les carabiniers arrivent par le premier bateau, et trouvent un homme assis sur un banc, qui les attendait.`],
     ["n", `Nane prend la canne du maître, la plonge dans le four, et souffle le premier verre de la journée. Pour Elena.`],
     ["n", `Bernardo joue un air très doux. Sa main tremble ; le trémolo est parfait.`],
-    ["b", `Biscotte s'endort contre l'arca, à côté de Tobiasse. Ils font semblant de ne pas se connaître.`],
+    ["b", `Biscotte s'endort contre l'arca, à côté de Tobias. Ils font semblant de ne pas se connaître.`],
   ],
   "cut.finale.retour": [
-    ["n", `Les couleurs s'effacent sur la table. La cuisine, en 2026. Tobiasse n'a pas bougé.`],
+    ["n", `Les couleurs s'effacent sur la table. La cuisine, en 2026. Tobias n'a pas bougé.`],
     ["benjamin", `Alors ?`],
     ["v", `Alors c'était le professeur. Celui qui expliquait tout.`],
     ["julien", `23h30m14s. Je l'avais noté.`],
     ["benjamin", `Papa...`],
-    ["n", `Véronique repose le petit verre dans son étui. Pour la première fois de la soirée, Tobiasse ouvre un oeil.`],
+    ["n", `Véronique repose le petit verre dans son étui. Pour la première fois de la soirée, Tobias ouvre un oeil.`],
   ],
 
   // ------------------------------------------------------------------ Boards
@@ -344,7 +344,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "combo.generic.2": [["b", `Biscotte renifle les deux fiches, et mâchonne pensivement un coin de la seconde.`]],
   "combo.generic.3": [["v.skeptic", `C'est joli, mais ça ne prouve rien.`]],
   "combo.generic.4": [["v", `Miss Marple aurait trouvé un lien. Moi, je trouve deux fiches.`]],
-  "combo.generic.5": [["v.amused", `Si je continue, je vais accuser Tobiasse.`]],
+  "combo.generic.5": [["v.amused", `Si je continue, je vais accuser Tobias.`]],
   "combo.generic.6": [["v.skeptic", `Non. On cherche une histoire qui tienne, pas une coïncidence.`]],
   "combo.generic.7": [["v", `Rien. Le vrai lien est ailleurs.`]],
   "combo.generic.8": [["b", `Biscotte pousse une autre fiche du museau. Elle sent le biscuit.`]],
@@ -365,7 +365,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "bis.eat": [["b", `Biscotte croque le biscuit de la Saint-Martin, cheval compris, puis fixe Véronique avec un sérieux total.`]],
   "bis.pet.0": [["b", `Biscotte ferme les yeux. Son petit foulard rouge glisse de travers.`]],
   "bis.pet.1": [["b", `Biscotte éternue. Un peu de poussière de four s'envole.`]],
-  "bis.pet.2": [["b", `Biscotte regarde Tobiasse. Tobiasse ne regarde pas Biscotte. C'est une longue histoire.`]],
+  "bis.pet.2": [["b", `Biscotte regarde Tobias. Tobias ne regarde pas Biscotte. C'est une longue histoire.`]],
   "bis.pet.3": [["b", `Biscotte essaie de manger le nez de Bernardo, de loin, par principe.`]],
   "hint.none": [["b", `Biscotte s'assoit. Il n'a rien à ajouter : tout est sur la table.`]],
   "hint.maxed": [["b", `Biscotte fixe l'endroit, puis Véronique, puis l'endroit. Il ne peut pas être plus clair.`]],

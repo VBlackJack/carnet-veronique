@@ -38,6 +38,7 @@
     const look = CH.mimeStory.HERO_LOOK || {};
     el.hero.innerHTML = `<div class="m-hero-flip"><div class="m-hero-body"><svg viewBox="${C.hero.viewBox}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g filter="url(#f-rough-s)">${A.namedGoat("biscotte", 0, 0, 1, false, look)}</g></svg></div></div>`;
     el.bee.innerHTML = beeSvg();
+    el.spots.addEventListener("click", nearTap);
   }
 
   function wrap(content) {
@@ -53,14 +54,52 @@
     renderSpots(s, sc, handlers);
   }
 
+  // Spots keep the size of what they cover, smallest on top where they overlap. A tap
+  // just beside a small spot still reaches it: see nearTap.
+  let live = { spots: [], handlers: null };
+
   function renderSpots(s, sc, handlers) {
     const t = CH.t;
-    const spots = sc.spots.filter((h) => !h.when || h.when(s));
+    const spots = sc.spots.filter((h) => !h.when || h.when(s)).sort((a, b) => b.w * b.h - a.w * a.h);
+    live = { spots, handlers };
     let html = spots.map((h) => `<button class="m-spot" data-spot="${h.id}" style="left:${pctX(h.x)};top:${pctY(h.y)};width:${pctX(h.w)};height:${pctY(h.h)}" aria-label="${CH.i18n.escapeHtml(t(`hs.${s.scene}.${h.id}`))}"></button>`).join("");
-    html += (sc.exits || []).filter((e) => !e.when || e.when(s)).map((e) => `<button class="m-exit m-exit-${e.side}" data-exit="${e.to}" style="left:${pctX(e.x)};top:${pctY(e.y)};width:${pctX(C.exitSize)};height:${pctY(C.exitSize)}" aria-label="${CH.i18n.escapeHtml(t("mime.nav.go", { name: t(`scene.${e.to}.name`) }))}">${ARROW}</button>`).join("");
+    html += (sc.exits || []).filter((e) => !e.when || e.when(s)).map((e) => `<button class="m-exit m-exit-${e.side}" data-exit="${e.to}" style="left:${pctX(e.x + C.exitSize / 2)};top:${pctY(e.y + C.exitSize / 2)};width:${pctX(C.exitSize)};height:${pctY(C.exitSize)}" aria-label="${CH.i18n.escapeHtml(t("mime.nav.go", { name: t(`scene.${e.to}.name`) }))}">${ARROW}</button>`).join("");
     el.spots.innerHTML = html;
     el.spots.querySelectorAll("[data-spot]").forEach((b) => b.addEventListener("click", () => handlers.spot(sc.spots.find((h) => h.id === b.dataset.spot))));
     el.spots.querySelectorAll("[data-exit]").forEach((b) => b.addEventListener("click", () => handlers.exit(sc.exits.find((e) => e.to === b.dataset.exit))));
+  }
+
+  // A tap on the empty stage goes to the nearest spot if the spot, grown to the minimum
+  // touch size around its centre, would have caught it. Exits are buttons already sized
+  // for a finger in CSS.
+  function nearTap(e) {
+    if (e.target !== el.spots || !live.handlers) return;
+    const r = el.spots.getBoundingClientRect();
+    if (!r.width) return;
+    const x = ((e.clientX - r.left) / r.width) * W;
+    const y = ((e.clientY - r.top) / r.height) * H;
+    const min = (C.touch.minPx / r.width) * W;
+    let best = null;
+    live.spots.forEach((h) => {
+      const dx = Math.max(0, Math.abs(x - (h.x + h.w / 2)) - h.w / 2);
+      const dy = Math.max(0, Math.abs(y - (h.y + h.h / 2)) - h.h / 2);
+      if (dx > Math.max(0, (min - h.w) / 2) || dy > Math.max(0, (min - h.h) / 2)) return;
+      const d = Math.hypot(dx, dy);
+      if (!best || d < best.d || (d === best.d && h.w * h.h < best.h.w * best.h.h)) best = { h, d };
+    });
+    if (best) live.handlers.spot(best.h);
+  }
+
+  // Briefly shimmers the given spots (touch screens: nothing shows them otherwise).
+  function hintSpots(ids, ms) {
+    ids.forEach((id) => {
+      const b = el.spots.querySelector(`[data-spot="${id}"]`);
+      if (!b) return;
+      b.classList.remove("m-hint");
+      void b.offsetWidth;
+      b.classList.add("m-hint");
+      setTimeout(() => b.classList.remove("m-hint"), ms);
+    });
   }
 
   // Bounding box of a spot or an exit, in stage coordinates, for the bee.
@@ -158,7 +197,7 @@
   const ARROW = `<svg viewBox="0 0 60 60" aria-hidden="true"><path d="M12 30h32M32 16l14 14-14 14" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
   CH.mime.stage = {
-    init, render, placeHero, walkTo, act, face, setHeroVisible, hero,
+    init, render, hintSpots, placeHero, walkTo, act, face, setHeroVisible, hero,
     beeTo, beeToElement, beeHide, targetBox, wait, pctX, pctY,
   };
 })();

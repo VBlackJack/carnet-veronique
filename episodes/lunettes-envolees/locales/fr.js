@@ -48,7 +48,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "hs.orchard.hives": `Les ruches`,
 
   "card.case": `L'étui vide, avec des poils roux et blancs`,
-  "card.dream": `Le rêve de Tobias : une patte, un objet qui tombe, un panier`,
+  "card.dream": `Le rêve de Tobias : une patte pousse un objet qui tombe`,
   "card.burn": `Au soleil, les vieilles lunettes font un point de feu`,
   "card.ring": `Un cercle propre dans la poussière, sous la table`,
   "card.ledger": `Le registre : à 7 heures, le panier part au verger`,
@@ -58,7 +58,7 @@ CH.locales.fr = Object.assign(CH.locales.fr || {}, {
   "card.loot": `Le butin de la pie : une cuillère et une perle`,
   "card.smoke": `Une fumerolle monte du tas de feuilles`,
 
-  "ded.cat": `Tobias a poussé les lunettes de la table en dormant`,
+  "ded.cat": `Tobias, endormi près de l'étui vide, a poussé les lunettes de la table`,
   "ded.trip": `Elles sont tombées dans le panier, parti au verger`,
   "ded.lens": `Les verres concentrent le soleil : les lunettes sont sous les feuilles`,
 });

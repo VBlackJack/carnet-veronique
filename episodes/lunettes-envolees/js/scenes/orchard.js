@@ -251,7 +251,7 @@
       if (flag(s, "barrow_moved")) return (has(s, "glint") ? [] : [{ card: "glint" }]).concat(climb);
       return has(s, "glint") ? [{ hero: "hop" }, { hero: "shake" }] : [{ hero: "hop" }, { card: "glint" }];
     } },
-    { id: "barrow", x: 1300, y: 690, w: 200, h: 112, at: 1500, when: (s) => !flag(s, "barrow_moved"), steps: [
+    { id: "barrow", x: 1300, y: 690, w: 150, h: 112, at: 1500, when: (s) => !flag(s, "barrow_moved"), steps: [
       { face: -1 }, { sfx: "creak" },
       { together: [{ beat: "barrow", ms: 1100, flag: "barrow_moved" }, { move: [1100, 805], ms: 1100 }] },
     ] },
@@ -269,8 +269,8 @@
       if (flag(s, "sun_out")) return has(s, "smoke") ? [{ face: -1 }, { hero: "sniff" }, { hero: "shake" }] : [{ face: -1 }, { hero: "sniff" }, { card: "smoke" }];
       return [{ face: -1 }, { hero: "sniff" }, { sfx: "rustle" }, { wait: 300 }, { sfx: "snore" }];
     } },
-    { id: "magpie", x: 1028, y: 226, w: 86, h: 72, steps: [{ beat: "magpie", ms: 600, sfx: "caw" }] },
-    { id: "cameo", x: 1286, y: 372, w: 120, h: 116, steps: [{ beat: "cameo", ms: 1300, sfx: "boing" }, { egg: "cameo" }] },
+    { id: "magpie", x: 1066, y: 230, w: 58, h: 58, steps: [{ beat: "magpie", ms: 600, sfx: "caw" }] },
+    { id: "cameo", x: 1286, y: 372, w: 120, h: 116, secret: true, steps: [{ beat: "cameo", ms: 1300, sfx: "boing" }, { egg: "cameo" }] },
     { id: "hives", x: 1452, y: 690, w: 146, h: 108, at: 1400, steps: [{ sfx: "buzz" }, { hero: "shake" }] },
   ];
 

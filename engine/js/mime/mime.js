@@ -42,7 +42,7 @@
 
   // ---------------------------------------------------------------- State
   function fresh() {
-    return { v: C.saveVersion, scene: ST().FIRST_SCENE, flags: {}, cards: [], deds: [], eggs: {}, seen: {}, playMs: 0, finished: false, heroX: null, started: false };
+    return { v: C.saveVersion, scene: ST().FIRST_SCENE, flags: {}, cards: [], deds: [], eggs: {}, seen: {}, visited: {}, playMs: 0, finished: false, heroX: null, started: false };
   }
 
   function save() {
@@ -223,6 +223,7 @@
   function onSpot(h) {
     snd().unlock();
     if (busy) return queue("spot", h.id);
+    s.visited[`${s.scene}.${h.id}`] = true;
     action(async () => {
       if (h.at !== undefined) await S().walkTo(h.at, ST().scenes[s.scene].ground);
       await run(h.steps);
@@ -243,7 +244,20 @@
     clearTimeout(idleTimer);
     clearTimeout(beeTimer);
     S().beeHide();
-    idleTimer = setTimeout(showBee, C.beeIdleMs);
+    idleTimer = setTimeout(showBee, isTouch() ? C.beeIdleMs.touch : C.beeIdleMs.mouse);
+  }
+
+  // A touch screen has no hover: the spots never glow under the finger before a tap.
+  const isTouch = () => window.matchMedia("(hover: none)").matches;
+
+  // Every few idle seconds on a touch screen, the spots not yet touched shimmer. Secret
+  // spots (the little details counted at the end) are left for the player to find.
+  function touchHint() {
+    if (!isTouch() || !s || busy || s.finished || !el.screen.hidden || CH.mime.book.isOpen()) return;
+    const ids = ST().scenes[s.scene].spots
+      .filter((h) => !h.secret && (!h.when || h.when(s)) && !s.visited[`${s.scene}.${h.id}`])
+      .map((h) => h.id);
+    S().hintSpots(ids, C.touchHint.showMs);
   }
 
   function showBee() {
@@ -306,6 +320,8 @@
     beat = null;
     pending = null;
     s = saved || fresh();
+    // Saves from before the touch hints have no record of visited spots.
+    s.visited = s.visited || {};
     el.screen.hidden = true;
     el.hud.hidden = false;
     el.stage.classList.remove("m-busy");
@@ -439,6 +455,7 @@
     document.title = t("episode.title");
     el.stage.style.setProperty("--m-blur-ms", `${C.blurMs}ms`);
     el.stage.style.setProperty("--m-fade-ms", `${C.fadeMs}ms`);
+    el.stage.style.setProperty("--m-touch", `${C.touch.minPx}px`);
     S().init();
     CH.mime.show.init();
     CH.mime.book.init();
@@ -466,6 +483,7 @@
     setInterval(() => {
       if (!document.hidden && s && el.screen.hidden && !s.finished) s.playMs += C.playtimeTickMs;
     }, C.playtimeTickMs);
+    setInterval(touchHint, C.touchHint.everyMs);
     showTitle();
   }
 
@@ -473,7 +491,7 @@
   const GRAIN_DEF = `<filter id="m-f-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 0.23  0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0.55 0"/></filter>`;
 
   CH.mime.game = {
-    init, state: () => s, addDed, markSeen, nudgeIdle: restartIdle, isBusy: () => busy,
+    init, state: () => s, addDed, markSeen, setFlag: (id) => { s.flags[id] = true; save(); }, nudgeIdle: restartIdle, isBusy: () => busy,
     // Lets a test page jump into the story.
     debug: { run: (steps) => action(() => run(steps)), progress: () => action(() => Promise.resolve()) },
   };

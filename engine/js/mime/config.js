@@ -24,6 +24,9 @@ CH.mime.config = Object.freeze(Object.assign({
   hero: { speed: 420, minWalkMs: 260, stepMs: 230, width: 230, scale: 0.78, viewBox: "-110 -200 230 215" },
   // Side of the arrow buttons that lead to another tableau, in stage pixels.
   exitSize: 90,
+  // Smallest comfortable target for a finger, in CSS pixels: spots smaller than this on
+  // screen still catch taps that land this close to them.
+  touch: { minPx: 44 },
   // Actions of the hero, in milliseconds (they match the CSS animations).
   heroMs: { hop: 700, pull: 900, sniff: 900, shake: 700, push: 1100, climb: 1300 },
   // A new card is shown big, then flies to the sketchbook button.
@@ -39,8 +42,14 @@ CH.mime.config = Object.freeze(Object.assign({
   blurPx: 7,
   blurMs: 1600,
   fadeMs: 700,
-  // The bee comes to show the next useful spot after this much idle time.
-  beeIdleMs: 35000,
+  // The first time the sketchbook offers a pair, a ghost hand shows it: wait before it
+  // appears, time per move, and pause on each card.
+  ghostHand: { delayMs: 700, moveMs: 900, tapMs: 450 },
+  // The bee comes to show the next useful spot after this much idle time: sooner on a
+  // touch screen, where nothing glows under a hovering pointer.
+  beeIdleMs: { mouse: 35000, touch: 18000 },
+  // On touch screens, spots not yet touched shimmer briefly every few seconds of idleness.
+  touchHint: { everyMs: 7000, showMs: 1400 },
   beeStayMs: 9000,
   playtimeTickMs: 1000,
   viewportSettleMs: 400,

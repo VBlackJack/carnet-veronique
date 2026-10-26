@@ -26,7 +26,8 @@
   const TABLE = { x: 560, y: 540, w: 500 };
   const CAT = { x: 920, y: 541, k: 1.3 };
   const VERO = { x: 500, y: 792, h: 400 };
-  const DREAM = { at: [960, 455], pics: ["paw", "then", "fall", "then", "basket"], dream: true };
+  // Tobias dreams of the push only: where the glasses landed is for the sketchbook to find.
+  const DREAM = { at: [960, 455], pics: ["paw", "then", "fall"], dream: true };
 
   function wall() {
     A.srand(101);
@@ -239,11 +240,11 @@
     { id: "sill", x: 205, y: 340, w: 105, h: 70, at: 255, steps: (s) => flag(s, "shutter_open")
       ? (has(s, "burn") ? [{ hero: "hop" }] : [{ hero: "hop" }, { card: "burn" }])
       : [{ hero: "hop" }, { hero: "shake" }] },
-    { id: "gerbera", x: 318, y: 278, w: 58, h: 108, at: 345, steps: [{ hero: "sniff" }, { beat: "gerbera", ms: 900, sfx: "boing" }, { egg: "gerbera" }] },
-    { id: "duck", x: 396, y: 338, w: 66, h: 50, at: 420, steps: [{ hero: "hop" }, { beat: "duck", ms: 500, sfx: "quack" }, { egg: "duck" }] },
+    { id: "gerbera", x: 318, y: 278, w: 58, h: 108, at: 345, secret: true, steps: [{ hero: "sniff" }, { beat: "gerbera", ms: 900, sfx: "boing" }, { egg: "gerbera" }] },
+    { id: "duck", x: 396, y: 338, w: 66, h: 50, at: 420, secret: true, steps: [{ hero: "hop" }, { beat: "duck", ms: 500, sfx: "quack" }, { egg: "duck" }] },
     { id: "ring", x: 690, y: 770, w: 160, h: 46, at: 650, steps: (s) => has(s, "ring") ? [{ hero: "sniff" }] : [{ hero: "sniff" }, { card: "ring" }] },
     { id: "ledger", x: 1104, y: 378, w: 116, h: 46, at: 1160, steps: (s) => has(s, "ledger") ? [{ hero: "hop" }] : [{ hero: "hop" }, { card: "ledger" }] },
-    { id: "record", x: 1220, y: 334, w: 80, h: 84, at: 1240, steps: [{ hero: "hop" }, { beat: "record", ms: 1400, sfx: "disco" }, { egg: "record" }] },
+    { id: "record", x: 1220, y: 334, w: 80, h: 84, at: 1240, secret: true, steps: [{ hero: "hop" }, { beat: "record", ms: 1400, sfx: "disco" }, { egg: "record" }] },
     { id: "veronique", x: 440, y: 400, w: 120, h: 300, at: 600, steps: (s) => flag(s, "wearing") ? [] : [{ face: -1 }, { bubble: { at: [VERO.x, 410], pics: ["glasses", "question"] } }] },
     { id: "door", x: 1456, y: 240, w: 140, h: 430, at: 1500, steps: [{ go: "orchard" }] },
   ];

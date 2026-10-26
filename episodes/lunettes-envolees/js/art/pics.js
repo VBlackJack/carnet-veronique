@@ -39,27 +39,48 @@
   };
 
   // ---------------------------------------------------------------- Cards
-  const fur = (x, y) => [0, 1, 2, 3].map((i) => `<path d="${A.curve([[x + i * 7, y], [x + i * 7 + 6, y - 6], [x + i * 7 + 3, y - 14]], 0.6)}" stroke="${i % 2 ? E.COL.furWhite : E.COL.fur}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`).join("");
+  // A tuft of cat hair: a fan of short wavy strands, each outlined in ink so it reads as
+  // fur and not as a decoration. Ginger and white, Tobias's colours.
+  const tuft = (x, y, k, seed) => {
+    A.srand(seed);
+    let s = "";
+    for (let i = 0; i < 7; i++) {
+      const a = (-150 + i * 20) * Math.PI / 180;
+      const len = (9 + A.rnd() * 6) * k;
+      const pts = [[x, y], [x + Math.cos(a) * len * 0.5 + 2 * k, y + Math.sin(a) * len * 0.5], [x + Math.cos(a) * len, y + Math.sin(a) * len]];
+      const col = i % 3 === 1 ? E.COL.furWhite : E.COL.fur;
+      s += `<path d="${A.curve(pts, 0.4)}" stroke="${P.ink}" stroke-width="${(3.6 * k).toFixed(1)}" fill="none" stroke-linecap="round"/>`;
+      s += `<path d="${A.curve(pts, 0)}" stroke="${col}" stroke-width="${(2 * k).toFixed(1)}" fill="none" stroke-linecap="round"/>`;
+    }
+    return s;
+  };
 
   const CARDS = {
     // The case is open and empty, a few ginger and white hairs in it.
     case: { pic: () => {
       A.srand(51);
       let s = wood();
-      // Lid thrown open behind, lining showing; the empty tray in front.
-      s += A.sh(A.soft([[34, 70], [126, 70], [138, 26], [22, 26]], 1), "#2f5450", { sw: 2.4 });
-      s += A.sh(A.soft([[42, 66], [118, 66], [126, 32], [34, 32]], 0.8), "#8fb3a8", { sw: 1.4 });
-      s += A.sh(A.soft([[30, 70], [130, 70], [124, 98], [36, 98]], 1), E.COL.frame, { sw: 2.4 });
-      s += A.sh(A.soft([[38, 72], [122, 72], [118, 88], [42, 88]], 0.6), "#8fb3a8", { sw: 1.4 });
-      return s + fur(64, 86);
+      // Lid thrown open behind, lining showing; the empty tray in front, a little to the left.
+      s += A.sh(A.soft([[14, 72], [96, 72], [106, 30], [4, 30]], 1), "#2f5450", { sw: 2.4 });
+      s += A.sh(A.soft([[22, 68], [88, 68], [96, 36], [12, 36]], 0.8), "#8fb3a8", { sw: 1.4 });
+      s += A.sh(A.soft([[10, 72], [100, 72], [94, 100], [16, 100]], 1), E.COL.frame, { sw: 2.4 });
+      s += A.sh(A.soft([[18, 74], [92, 74], [88, 90], [22, 90]], 0.6), "#8fb3a8", { sw: 1.4 });
+      s += tuft(46, 88, 0.8, 3) + tuft(64, 89, 0.7, 4);
+      // A magnifier over the hairs: what Biscotte's nose noticed, made plain.
+      s += `<path d="M58 84L112 52" stroke="${P.inkSoft}" stroke-width="1.4" stroke-dasharray="3 3"/>`;
+      s += `<circle cx="124" cy="44" r="28" fill="#c8dcd4" stroke="${P.ochre}" stroke-width="5"/>`;
+      s += tuft(122, 58, 1.7, 3);
+      s += `<path d="M110 30q8 -8 20 -6" stroke="#ffffff" stroke-width="3" fill="none" opacity=".9"/>`;
+      s += `<path d="M144 64l12 14" stroke="${P.woodDark}" stroke-width="7" stroke-linecap="round"/>`;
+      return s;
     } },
-    // Tobias dreams that his paw pushes something round off the table, into a basket.
+    // Tobias dreams that his paw pushes something round off the table.
     dream: { pic: () => {
       let s = paper("#f3eefa");
       s += E.catHead(34, 78, 0.9);
       s += `<circle cx="64" cy="54" r="4" fill="#fbf6ea" stroke="${P.ink}" stroke-width="1.6"/><circle cx="74" cy="42" r="6" fill="#fbf6ea" stroke="${P.ink}" stroke-width="1.6"/>`;
       s += A.sh(A.blob(116, 44, 40, 34, 0.08, 12), "#fbf6ea", { sw: 2 });
-      s += E.paw(96, 36, 0.5) + E.specs(118, 30, 0.45, { rot: 30 }) + E.speed(110, 22, 6, 10, 2, 0.6) + E.basket(124, 72, 0.4);
+      s += E.paw(98, 38, 0.55) + E.specs(132, 54, 0.5, { rot: 40 }) + E.speed(116, 36, 7, 11, 3, 0.7);
       return s;
     } },
     // Sun through the old glasses: a burning point on the windowsill, an old burn mark.
@@ -111,7 +132,19 @@
   // ---------------------------------------------------------------- Deductions
   const DED_ART = {
     // Tobias pushed the glasses off the table in his sleep.
-    cat: () => paper("#fff6df") + E.tableEdge(0, 40, 90) + E.paw(74, 30, 0.6) + E.specs(112, 70, 0.8, { rot: 60 }) + E.speed(96, 50, 10, 16, 3) + E.basket(118, 106, 0.42),
+    // Neither card shows it alone: Tobias asleep on the table, beside the open empty case,
+    // his paw sweeping the glasses over the edge. Where they land is left for later.
+    cat: () => {
+      let s = paper("#fff6df");
+      s += E.tableEdge(0, 64, 116);
+      s += A.sh(A.soft([[8, 64], [34, 64], [32, 58], [10, 58]], 0.4), E.COL.frame, { sw: 1.6 });
+      s += A.sh(A.soft([[10, 58], [32, 58], [36, 46], [6, 46]], 0.4), "#2f5450", { sw: 1.6 });
+      s += A.namedCat("tobiasse", 66, 64, 0.55, false);
+      [[86, 20, 2.4], [94, 12, 3.2], [104, 4, 4]].forEach(([x, y, r]) => (s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#f3eefa" stroke="${P.ink}" stroke-width="1.2"/>`));
+      s += E.paw(110, 58, 0.32);
+      s += E.specs(134, 84, 0.6, { rot: 55 }) + E.speed(118, 66, 8, 12, 3, 0.8);
+      return s;
+    },
     // They fell into the basket, which went to the orchard.
     trip: () => {
       let s = paper("#fff6df");

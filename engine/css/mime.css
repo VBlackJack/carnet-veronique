@@ -21,7 +21,8 @@
   --m-blur: 0px;
   --m-blur-ms: 1600ms;
   --m-fade-ms: 700ms;
-  --m-btn: max(4.2cqw, 38px);
+  --m-touch: 44px;
+  --m-btn: max(4.2cqw, var(--m-touch));
   background: #2a211c;
 }
 
@@ -89,12 +90,23 @@
   cursor: pointer;
   transition: box-shadow 0.25s, background 0.25s;
 }
+/* Touch screens: a short shimmer on spots not yet touched (mime.js, touchHint). */
+.m-spot.m-hint { animation: m-hint 1.4s ease-in-out; }
+@keyframes m-hint {
+  0%, 100% { background: rgba(255, 238, 190, 0); box-shadow: none; }
+  40% { background: radial-gradient(closest-side, rgba(255, 246, 215, 0.55), rgba(255, 238, 190, 0)); box-shadow: 0 0 1.2cqw 0.3cqw rgba(255, 238, 190, 0.35); }
+}
 @media (hover: hover) {
   .m-spot:hover { background: radial-gradient(closest-side, rgba(255, 238, 190, 0.28), rgba(255, 238, 190, 0)); }
 }
 .m-spot:focus-visible { outline: 0.25cqw dashed #fff3cf; outline-offset: 0.2cqw; }
+/* Exits are centred on their point (translate), so the finger-size minimum grows them
+   evenly instead of pushing them off the stage. */
 .m-exit {
   position: absolute;
+  translate: -50% -50%;
+  min-width: var(--m-touch);
+  min-height: var(--m-touch);
   display: grid;
   place-items: center;
   padding: 0;
@@ -278,6 +290,22 @@
     linear-gradient(to top right, transparent calc(50% - 0.25cqw), #b0302a calc(50% - 0.25cqw) calc(50% + 0.25cqw), transparent calc(50% + 0.25cqw)),
     linear-gradient(to top left, transparent calc(50% - 0.25cqw), #b0302a calc(50% - 0.25cqw) calc(50% + 0.25cqw), transparent calc(50% + 0.25cqw));
 }
+/* Used up: every deduction of this card is found (sketchbook.js, isUsed). */
+.m-book-card.m-used { opacity: 0.5; }
+.m-book-card.m-used::after {
+  content: "";
+  position: absolute;
+  right: 6%;
+  bottom: 8%;
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #5f8a4a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10l3.5 3.5L15 7' fill='none' stroke='%23fbf6ea' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 70% no-repeat;
+  border: 0.15cqw solid #3b2f2a;
+}
+/* The ghost hand that shows the first pair, once (sketchbook.js, showGhostHand). */
+.m-ghost-hand { position: absolute; left: 0; top: 0; width: 4.4cqw; margin: -0.6cqw 0 0 -1.4cqw; pointer-events: none; opacity: 0; z-index: 2; filter: drop-shadow(0 0.3cqw 0.4cqw rgba(0, 0, 0, 0.35)); }
+.m-ghost-hand svg { display: block; width: 100%; height: auto; }
 .m-book-seam { height: 0.3cqw; background: repeating-linear-gradient(90deg, #3b2f2a 0 1.2cqw, transparent 1.2cqw 2cqw); opacity: 0.4; }
 .m-book-deds { display: flex; justify-content: center; gap: 2cqw; }
 .m-ded { width: 19cqw; background: #fff6df; border-width: 0.24cqw; }

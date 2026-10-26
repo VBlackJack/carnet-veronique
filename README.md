@@ -15,6 +15,7 @@ saved automatically. Phones work in landscape, with a fullscreen button.
 | Path | Content |
 |---|---|
 | `index.html` | The shelf |
+| `lab.html` | The laboratory: games being tried out, behind a little door at the foot of the shelf |
 | `engine/` | The shared game engine, drawing kit and interface texts |
 | `episodes/<name>/` | One investigation: its story, scenes, characters and texts |
 

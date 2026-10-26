@@ -14,29 +14,36 @@
  * limitations under the License.
  */
 
-// The shelf: every investigation of the series, in order. Only entries marked
-// released are copied to the public site. Texts: shelf.<id>.title / shelf.<id>.tagline.
+// The shelf: every game of the series, in order. Texts: shelf.<id>.title / shelf.<id>.tagline.
+// stage: "released" is on the shelf page; "lab" is published too, but only shown behind the
+// laboratory door (lab.html), for games being tried out; "workshop" never leaves the workshop.
 window.CH = window.CH || {};
 CH.shelf = [
   {
     id: "chevrerie",
-    released: true,
+    stage: "released",
     cover: "goat",
   },
   {
     id: "boule-a-facettes",
-    released: true,
+    stage: "released",
     cover: "disco",
   },
   {
     id: "verre-de-minuit",
-    released: true,
+    stage: "released",
     cover: "glass",
   },
   {
     id: "le-monocle",
-    released: true,
+    stage: "released",
     cover: "monocle",
+  },
+  // Wordless pilot (pantomime engine), tried out in the laboratory.
+  {
+    id: "lunettes-envolees",
+    stage: "lab",
+    cover: "spectacles",
   },
   // Birthday gift for 2026-12-05: kept in the workshop, never published before then.
 ];

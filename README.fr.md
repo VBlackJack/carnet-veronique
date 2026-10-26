@@ -16,6 +16,7 @@ bouton plein écran.
 | Chemin | Contenu |
 |---|---|
 | `index.html` | L'étagère |
+| `lab.html` | Le laboratoire : les jeux en cours d'essai, derrière une petite porte au pied de l'étagère |
 | `engine/` | Le moteur commun, le kit de dessin et les textes de l'interface |
 | `episodes/<nom>/` | Une enquête : son histoire, ses décors, ses personnages et ses textes |
 
